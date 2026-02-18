@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PaGeR: Panorama Geometry Estimation</title>
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Google+Sans:wght@400;500;700&display=swap"
+    rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Round" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Three.js -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+  <!-- Material Design 3 Theme Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Google Sans', 'Roboto', 'sans-serif'],
+            mono: ['Roboto Mono', 'monospace'],
+          },
+          colors: {
+            md: {
+              sys: {
+                color: {
+                  primary: '#0061A4',
+                  onPrimary: '#FFFFFF',
+                  primaryContainer: '#D1E4FF',
+                  onPrimaryContainer: '#001D36',
+                  secondary: '#535F70',
+                  onSecondary: '#FFFFFF',
+                  secondaryContainer: '#D7E3F7',
+                  onSecondaryContainer: '#101C2B',
+                  tertiary: '#6B5778',
+                  onTertiary: '#FFFFFF',
+                  tertiaryContainer: '#F2DAFF',
+                  onTertiaryContainer: '#251431',
+                  surface: '#FDFCFF',
+                  onSurface: '#1A1C1E',
+                  surfaceVariant: '#DFE2EB',
+                  onSurfaceVariant: '#43474E',
+                  outline: '#73777F',
+                  background: '#FDFCFF',
+                }
+              }
+            }
+          },
+          boxShadow: {
+            'elevation-1': '0px 1px 2px rgba(0, 0, 0, 0.3), 0px 1px 3px 1px rgba(0, 0, 0, 0.15)',
+            'elevation-2': '0px 1px 2px rgba(0, 0, 0, 0.3), 0px 2px 6px 2px rgba(0, 0, 0, 0.15)',
+            'elevation-3': '0px 4px 8px 3px rgba(0, 0, 0, 0.15), 0px 1px 3px rgba(0, 0, 0, 0.3)',
+          },
+          borderRadius: {
+            'xs': '4px',
+            'sm': '8px',
+            'md': '12px',
+            'lg': '16px',
+            'xl': '28px',
+            '2xl': '32px',
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #FDFCFF;
+      /* md.sys.color.background */
+      color: #1A1C1E;
+      /* md.sys.color.onSurface */
+    }
+
+    /* Smooth Scrolling */
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Typography Override */
+    h1,
+    h2,
+    h3,
+    h4 {
+      font-family: 'Google Sans', sans-serif;
+    }
+
+    /* Material Slider (Comparison) */
+    .comparison-view {
+      position: relative;
+      width: 100%;
+      height: 400px;
+      overflow: hidden;
+      border-radius: 1.5rem;
+      cursor: col-resize;
+      touch-action: none;
+    }
+
+    .comparison-image {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: cover;
+      background-position: center;
+    }
+
+    .comparison-handle {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+      background: #FFFFFF;
+      z-index: 10;
+      pointer-events: none;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    }
+
+    .comparison-knob {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 48px;
+      height: 48px;
+      background: #D1E4FF;
+      /* Primary Container */
+      color: #001D36;
+      /* On Primary Container */
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+
+    /* 3D Canvas Styles */
+    .canvas-container {
+      width: 100%;
+      height: 400px;
+      background: #1A1C1E;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Code Block Styling */
+    pre {
+      background: #F1F4F9;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      overflow-x: auto;
+      font-family: 'Roboto Mono', monospace;
+      font-size: 0.875rem;
+      color: #1A1C1E;
+    }
+
+    /* Scrollbar hiding for carousel */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+  </style>
+</head>
+
+<body class="antialiased">
+
+  <!-- Main Content -->
+  <main class="max-w-5xl mx-auto px-4 pt-16 pb-24 space-y-24">
+
+    <!-- Hero Section -->
+    <section class="text-center space-y-8">
+
+      <h1 class="text-5xl md:text-7xl font-bold tracking-tight text-md-sys-color-onSurface leading-tight">
+        PaGeR: Panorama Geometry Estimation
+      </h1>
+      <p class="text-2xl md:text-3xl font-light text-md-sys-color-onSurfaceVariant max-w-3xl mx-auto">
+        High-Resolution Depth and Normals using Single-Step Diffusion Models
+      </p>
+
+      <!-- Authors -->
+      <div class="flex flex-wrap justify-center gap-x-8 gap-y-3 text-lg leading-relaxed">
+        <span
+          class="group relative cursor-pointer font-medium text-md-sys-color-primary inline-flex items-center gap-2">
+          <img src="images/thumbs/vukasin.png" alt="Vukasin Bozic"
+            class="w-10 h-10 rounded-md border border-gray-200 shadow-sm bg-gray-100">
+          Vukasin Bozic¹
+        </span>
+        <span
+          class="group relative cursor-pointer font-medium text-md-sys-color-primary inline-flex items-center gap-2">
+          <img src="images/thumbs/isidora.png" alt="Isidora Slavkovic"
+            class="w-10 h-10 rounded-md border border-gray-200 shadow-sm bg-gray-100">
+          Isidora Slavkovic²
+        </span>
+        <span
+          class="group relative cursor-pointer font-medium text-md-sys-color-primary inline-flex items-center gap-2">
+          <img src="images/thumbs/dominik.png" alt="Dominik Narnhofer"
+            class="w-10 h-10 rounded-md border border-gray-200 shadow-sm bg-gray-100">
+          Dominik Narnhofer¹
+        </span>
+        <span
+          class="group relative cursor-pointer font-medium text-md-sys-color-primary inline-flex items-center gap-2">
+          <img src="images/thumbs/nando.png" alt="Nando Metzger"
+            class="w-10 h-10 rounded-md border border-gray-200 shadow-sm bg-gray-100">
+          Nando Metzger¹
+        </span>
+        <span
+          class="group relative cursor-pointer font-medium text-md-sys-color-primary inline-flex items-center gap-2">
+          <img src="images/thumbs/denis.png" alt="Denis Rozumny"
+            class="w-10 h-10 rounded-md border border-gray-200 shadow-sm bg-gray-100">
+          Denis Rozumny¹
+        </span>
+        <span
+          class="group relative cursor-pointer font-medium text-md-sys-color-primary inline-flex items-center gap-2">
+          <img src="images/thumbs/konrad.png" alt="Konrad Schindler"
+            class="w-10 h-10 rounded-md border border-gray-200 shadow-sm bg-gray-100">
+          Konrad Schindler¹
+        </span>
+        <span
+          class="group relative cursor-pointer font-medium text-md-sys-color-primary inline-flex items-center gap-2">
+          <img src="images/thumbs/nikolai.png" alt="Nikolai Kalischek"
+            class="w-10 h-10 rounded-md border border-gray-200 shadow-sm bg-gray-100">
+          Nikolai Kalischek²
+        </span>
+      </div>
+
+      <div class="flex flex-wrap justify-center gap-6 text-md-sys-color-onSurfaceVariant font-medium">
+        <div class="flex items-center gap-2">
+          <span class="material-icons-round text-md-sys-color-secondary">school</span> ¹ETH Zurich
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="material-icons-round text-md-sys-color-secondary">business</span> ²Google
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex flex-wrap justify-center gap-4 pt-4">
+        <a href="#"
+          class="inline-flex items-center px-6 py-3 rounded-full bg-md-sys-color-secondaryContainer text-md-sys-color-onSecondaryContainer font-medium hover:shadow-elevation-1 transition">
+          <span class="material-icons-round mr-2">description</span> arXiv
+        </a>
+        <a href="#"
+          class="inline-flex items-center px-6 py-3 rounded-full bg-md-sys-color-secondaryContainer text-md-sys-color-onSecondaryContainer font-medium hover:shadow-elevation-1 transition">
+          <span class="mr-2 text-lg">🤗</span> HF Demo
+        </a>
+        <a href="#"
+          class="inline-flex items-center px-6 py-3 rounded-full bg-md-sys-color-secondaryContainer text-md-sys-color-onSecondaryContainer font-medium hover:shadow-elevation-1 transition">
+          <span class="material-icons-round mr-2">code</span> Code
+        </a>
+        <span
+          class="inline-flex items-center px-6 py-3 rounded-full bg-md-sys-color-surfaceVariant/50 text-md-sys-color-onSurfaceVariant/50 font-medium cursor-not-allowed">
+          <span class="material-icons-round mr-2">dataset</span> Dataset
+        </span>
+      </div>
+
+      <!-- Hero Image/Video Placeholder -->
+      <div class="relative w-full aspect-video rounded-3xl overflow-hidden shadow-elevation-2 bg-gray-100 mt-12 group">
+        <!-- Replace src with actual teaser video/image -->
+        <img src="https://picsum.photos/seed/panorama_hero/1600/900"
+          class="w-full h-full object-cover transition duration-700 group-hover:scale-105" alt="Teaser">
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div class="bg-black/40 backdrop-blur-sm text-white px-6 py-3 rounded-2xl border border-white/20">
+            <span class="font-medium">Teaser Video Placeholder</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Abstract Section -->
+    <section id="abstract" class="scroll-mt-24">
+      <div
+        class="bg-md-sys-color-surface p-8 md:p-12 rounded-3xl border border-md-sys-color-surfaceVariant/50 shadow-sm">
+        <h2 class="text-3xl font-bold mb-6 text-md-sys-color-onSurface">Abstract</h2>
+        <p class="text-lg text-md-sys-color-onSurfaceVariant leading-relaxed text-justify">
+          Monocular geometry estimation has greatly advanced in recent years and has matured to the point where
+          off-the-shelf, foundational models are readily available. Several such models are based on denoising
+          diffusion, which has shown a remarkable ability to transfer learned priors from color image generation to
+          (image-conditional) geometry reconstruction, by fine-tuning on large synthetic depth datasets. We extend
+          diffusion-based monodepth to the more challenging task of estimating full panoramic 3D geometry.
+          <br><br>
+          We leverage recent advances in panorama generation and diffusion fine-tuning and introduce <strong>PaGeR
+            (Panoramic Geometry Reconstruction)</strong>: a one-step diffusion model trained directly in pixel space,
+          which enables high-resolution prediction of panoramic depth and surface normals, with strong generalization to
+          new, unseen environments. As part of our effort, we introduce a synthetic high-resolution dataset of indoor
+          and outdoor scenes with associated metric depth and surface normals. Extensive experiments show that our model
+          produces coherent, metrically accurate, sharp depth and normal maps, and outperforms prior approaches not only
+          in domain but also in few-shot and zero-shot scenarios.
+        </p>
+      </div>
+    </section>
+
+    <!-- Method Section -->
+    <section id="method" class="scroll-mt-24">
+      <div class="text-center mb-10">
+        <h2 class="text-3xl font-bold text-md-sys-color-onSurface">Method</h2>
+      </div>
+
+      <div class="bg-white rounded-3xl overflow-hidden shadow-elevation-1 border border-md-sys-color-outline/20">
+        <div class="bg-white flex items-center justify-center relative">
+          <!-- Replace with actual method diagram -->
+          <img src="images/data/model.png" class="p-8 w-xl object-cover" alt="Method Figure">
+        </div>
+        <div class="bg-gray-100 p-8">
+          <div class="grid md:grid-cols-3 gap-8">
+            <div>
+              <h3 class="font-bold text-lg mb-2 text-md-sys-color-primary">Cubemap Projection</h3>
+              <p class="text-md-sys-color-onSurfaceVariant text-sm leading-relaxed">
+                We project the equirectangular panorama into a cubemap representation to avoid polar distortion and
+                leverage standard convolutional architectures.
+              </p>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg mb-2 text-md-sys-color-primary">Pixel-Space Diffusion</h3>
+              <p class="text-md-sys-color-onSurfaceVariant text-sm leading-relaxed">
+                Unlike latent models, PaGeR operates in pixel space, preserving the high-frequency details essential for
+                accurate normal estimation and depth discontinuities.
+              </p>
+            </div>
+            <div>
+              <h3 class="font-bold text-lg mb-2 text-md-sys-color-primary">One-Step Inference</h3>
+              <p class="text-md-sys-color-onSurfaceVariant text-sm leading-relaxed">
+                Through distillation, we achieve high-quality geometry estimation in a single inference step, making the
+                method computationally efficient for high-resolution outputs.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Results Section -->
+    <section id="results" class="scroll-mt-24">
+      <h2 class="text-3xl font-bold mb-8 text-md-sys-color-onSurface">Interactive Results</h2>
+
+      <div class="space-y-12">
+
+        <!-- 1. 360 Depth Viewer -->
+        <div
+          class="bg-md-sys-color-surface p-1 rounded-3xl shadow-elevation-1 border border-md-sys-color-outline/20 overflow-hidden">
+          <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-md-sys-color-surface">
+            <div>
+              <h3 class="text-xl font-bold text-md-sys-color-onSurface flex items-center gap-2">
+                <span class="material-icons-round text-md-sys-color-tertiary">360</span> Panoramic Depth
+              </h3>
+              <p class="text-sm text-md-sys-color-onSurfaceVariant">Select a scene to visualize depth geometry.</p>
+            </div>
+            <span
+              class="bg-md-sys-color-tertiaryContainer text-md-sys-color-onTertiaryContainer text-xs font-bold px-3 py-1 rounded-full">Interactive</span>
+          </div>
+
+          <!-- Scene Carousel -->
+          <div class="px-6 pt-4 bg-md-sys-color-surface/50">
+            <div id="scene-selector" class="flex gap-4 overflow-x-auto no-scrollbar p-2">
+              <!-- Thumbnails injected by JS -->
+            </div>
+          </div>
+
+          <!-- Canvas -->
+          <div id="viewer-360" class="canvas-container" style="height: 500px;"></div>
+        </div>
+
+        <!-- 2. Normals Comparison & Point Cloud Grid -->
+        <div class="grid lg:grid-cols-2 gap-8">
+
+          <!-- Normals Slider -->
+          <div class="bg-white p-1 rounded-3xl shadow-elevation-1 border border-md-sys-color-outline/20">
+            <div class="p-6 border-b border-gray-100 bg-white rounded-t-3xl">
+              <h3 class="text-xl font-bold text-md-sys-color-onSurface flex items-center gap-2">
+                <span class="material-icons-round text-md-sys-color-primary">compare_arrows</span> Surface Normals
+              </h3>
+              <p class="text-sm text-md-sys-color-onSurfaceVariant">Slide to compare RGB vs Predicted Normals.</p>
+            </div>
+
+            <!-- Normals Carousel (Added) -->
+            <div class="px-6 pt-4 bg-white/50">
+              <div id="normals-selector" class="flex gap-4 overflow-x-auto no-scrollbar p-2">
+                <!-- Thumbnails injected by JS -->
+              </div>
+            </div>
+
+            <div id="slider-normals" class="comparison-view" onmousemove="updateSlider(event, 'slider-normals')"
+              ontouchmove="updateSlider(event, 'slider-normals')">
+              <!-- Background: RGB -->
+              <div id="normals-bg" class="comparison-image"
+                style="background-image: url('https://picsum.photos/id/1033/800/800');"></div>
+              <!-- Foreground: Normals (clipped) -->
+              <div class="comparison-image" id="slider-overlay"
+                style="background-image: url('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/normal-map.jpg'); width: 50%; border-right: 2px solid white;">
+              </div>
+
+              <div class="comparison-handle" style="left: 50%;">
+                <div class="comparison-knob">
+                  <span class="material-icons-round text-xl">code</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Point Cloud -->
+          <div class="bg-white p-1 rounded-3xl shadow-elevation-1 border border-md-sys-color-outline/20">
+            <div class="p-6 border-b border-gray-100 bg-white rounded-t-3xl">
+              <h3 class="text-xl font-bold text-md-sys-color-onSurface flex items-center gap-2">
+                <span class="material-icons-round text-md-sys-color-secondary">view_in_ar</span> 3D Point Cloud
+              </h3>
+              <p class="text-sm text-md-sys-color-onSurfaceVariant">Reconstructed geometry from depth.</p>
+            </div>
+
+            <!-- Point Cloud Carousel (Added) -->
+            <div class="px-6 pt-4 bg-white/50">
+              <div id="cloud-selector" class="flex gap-4 overflow-x-auto no-scrollbar p-2">
+                <!-- Thumbnails injected by JS -->
+              </div>
+            </div>
+
+            <div id="viewer-cloud" class="canvas-container"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Citation Section -->
+    <section id="citation" class="scroll-mt-24">
+      <h2 class="text-2xl font-bold mb-6 text-md-sys-color-onSurface">Citation</h2>
+      <pre class="shadow-inner border border-gray-200"><code>@article{bozic2026pager,
+  title={PaGeR: Panorama Geometry Estimation using Single-Step Diffusion Models},
+  author={Bozic, Vukasin and Slavkovic, Isidora and Narnhofer, Dominik and Metzger, Nando and Rozumny, Denis and Schindler, Konrad and Kalischek, Nikolai},
+  journal={arXiv preprint},
+  year={2025}
+}</code></pre>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-md-sys-color-onSurface text-md-sys-color-surface py-12 mt-12">
+    <div class="max-w-4xl mx-auto px-4 text-center">
+      <div class="text-xs text-gray-600 border-t border-gray-800 pt-8">
+        <p>&copy; 2026 PaGeR Project. Website template adapted for Material Design 3.</p>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Interactive Logic -->
+  <script>
+    // --- Slider Logic ---
+    function updateSlider(e, id) {
+      const container = document.getElementById(id);
+      const overlay = container.querySelector('#slider-overlay');
+      const handle = container.querySelector('.comparison-handle');
+
+      const rect = container.getBoundingClientRect();
+      // Support touch and mouse
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+
+      let x = clientX - rect.left;
+      x = Math.max(0, Math.min(x, rect.width));
+      const percent = (x / rect.width) * 100;
+
+      overlay.style.width = percent + "%";
+      handle.style.left = percent + "%";
+    }
+
+    // --- 360 Viewer (Three.js) ---
+    function init360() {
+      const container = document.getElementById('viewer-360');
+      const selectorContainer = document.getElementById('scene-selector');
+      if (!container || !selectorContainer) return;
+
+      // Define Scenes (Demo Data)
+      // Using standard equirectangular projections from Wikimedia Commons
+      const scenes = [
+        {
+          id: 'earth',
+          name: 'Indoor',
+          url: 'https://upload.wikimedia.org/wikipedia/commons/f/f0/Equirectangular_projection_SW.jpg',
+          thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Equirectangular_projection_SW.jpg/320px-Equirectangular_projection_SW.jpg'
+        },
+        {
+          id: 'mars',
+          name: 'Outdoor',
+          url: 'https://upload.wikimedia.org/wikipedia/commons/c/c4/Equirectangular_projection_of_Mars_Viking_orbiters_mosaic.jpg',
+          thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Equirectangular_projection_of_Mars_Viking_orbiters_mosaic.jpg/320px-Equirectangular_projection_of_Mars_Viking_orbiters_mosaic.jpg'
+        },
+        {
+          id: 'moon',
+          name: 'Street',
+          url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Cylindrical_Map_of_the_Moon.jpg/1280px-Cylindrical_Map_of_the_Moon.jpg', // Actually Cylindrical but works for demo
+          thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Cylindrical_Map_of_the_Moon.jpg/320px-Cylindrical_Map_of_the_Moon.jpg'
+        }
+      ];
+
+      // Setup Three.js
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      container.appendChild(renderer.domElement);
+
+      // Inverted Sphere
+      const geometry = new THREE.SphereGeometry(500, 60, 40);
+      geometry.scale(-1, 1, 1);
+
+      // Initialize material with map: null and color. 
+      // This plus needsUpdate later ensures shader recompilation when texture arrives.
+      const material = new THREE.MeshBasicMaterial({ map: null, color: 0xffffff });
+      const sphere = new THREE.Mesh(geometry, material);
+      scene.add(sphere);
+
+      camera.position.set(0, 0, 0.1);
+
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableZoom = false;
+      controls.rotateSpeed = -0.5;
+      controls.autoRotate = true;
+      controls.autoRotateSpeed = 0.5;
+
+      // Texture Loading Logic
+      // IMPORTANT: CrossOrigin must be anonymous for WebGL textures from external URLs
+      const textureLoader = new THREE.TextureLoader();
+      textureLoader.setCrossOrigin('anonymous');
+
+      let currentSceneIndex = 0;
+
+      function loadScene(index) {
+        currentSceneIndex = index;
+        const sceneData = scenes[index];
+
+        // Update Thumbnails UI
+        const buttons = selectorContainer.querySelectorAll('button');
+        buttons.forEach((btn, idx) => {
+          if (idx === index) {
+            btn.classList.add('ring-4', 'ring-md-sys-color-primary', 'opacity-100');
+            btn.classList.remove('opacity-70', 'hover:opacity-100');
+          } else {
+            btn.classList.remove('ring-4', 'ring-md-sys-color-primary', 'opacity-100');
+            btn.classList.add('opacity-70', 'hover:opacity-100');
+          }
+        });
+
+        // Load Texture
+        textureLoader.load(sceneData.url,
+          function (tex) {
+            // Success: Apply texture
+            sphere.material.map = tex;
+            sphere.material.needsUpdate = true;
+          },
+          undefined,
+          function (err) {
+            // Error (e.g. Network/CORS fail): Fallback to grid
+            console.warn("Error loading texture, using fallback grid.", err);
+            const canvas = document.createElement('canvas');
+            canvas.width = 512; canvas.height = 256;
+            const ctx = canvas.getContext('2d');
+
+            // Draw dark background
+            ctx.fillStyle = '#102040';
+            ctx.fillRect(0, 0, 512, 256);
+
+            // Draw Grid
+            ctx.strokeStyle = '#406090';
+            ctx.lineWidth = 2;
+            for (let i = 0; i < 512; i += 32) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 256); ctx.stroke(); }
+            for (let i = 0; i < 256; i += 32) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(512, i); ctx.stroke(); }
+
+            // Draw Text
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText("Image Load Failed", 256, 128);
+
+            const fallbackTex = new THREE.CanvasTexture(canvas);
+            sphere.material.map = fallbackTex;
+            sphere.material.needsUpdate = true;
+          }
+        );
+      }
+
+      // Generate UI
+      scenes.forEach((item, index) => {
+        const btn = document.createElement('button');
+        btn.className = `flex-shrink-0 w-24 h-16 rounded-lg bg-cover bg-center transition-all duration-200 border border-gray-200 shadow-sm opacity-70 hover:opacity-100 focus:outline-none`;
+        btn.style.backgroundImage = `url('${item.thumb}')`;
+        btn.title = item.name;
+        btn.onclick = () => loadScene(index);
+
+        // Label overlay
+        const span = document.createElement('span');
+        span.className = 'block w-full h-full flex items-end justify-center pb-1 text-xs text-white font-bold drop-shadow-md bg-gradient-to-t from-black/60 to-transparent rounded-lg';
+        span.innerText = item.name;
+        btn.appendChild(span);
+
+        selectorContainer.appendChild(btn);
+      });
+
+      // Initial Load
+      loadScene(0);
+
+      // Animation Loop
+      function animate() {
+        requestAnimationFrame(animate);
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      // Handle Resize
+      window.addEventListener('resize', () => {
+        if (container.clientWidth > 0 && container.clientHeight > 0) {
+          camera.aspect = container.clientWidth / container.clientHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+      });
+    }
+
+    // --- Normals Carousel Logic ---
+    function initNormals() {
+      const selectorContainer = document.getElementById('normals-selector');
+      const bgDiv = document.getElementById('normals-bg');
+      const overlayDiv = document.getElementById('slider-overlay');
+
+      if (!selectorContainer || !bgDiv || !overlayDiv) return;
+
+      // Demo Data for Normals Comparison
+      const normalScenes = [
+        {
+          name: 'Indoor',
+          thumb: 'https://picsum.photos/id/1033/320/200',
+          rgb: 'https://picsum.photos/id/1033/800/800',
+          normal: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/normal-map.jpg'
+        },
+        {
+          name: 'City',
+          thumb: 'https://picsum.photos/id/1067/320/200',
+          rgb: 'https://picsum.photos/id/1067/800/800',
+          // Using the same normal map placeholder for demo, normally would be distinct
+          normal: 'https://upload.wikimedia.org/wikipedia/commons/2/22/Normal_map_of_a_brick_wall.jpg'
+        },
+        {
+          name: 'Abstract',
+          thumb: 'https://picsum.photos/id/1070/320/200',
+          rgb: 'https://picsum.photos/id/1070/800/800',
+          normal: 'https://upload.wikimedia.org/wikipedia/commons/a/aa/Normal_map.png'
+        }
+      ];
+
+      function loadNormalScene(index) {
+        const scene = normalScenes[index];
+
+        // Update CSS Backgrounds
+        bgDiv.style.backgroundImage = `url('${scene.rgb}')`;
+        overlayDiv.style.backgroundImage = `url('${scene.normal}')`;
+
+        // Update UI State
+        const buttons = selectorContainer.querySelectorAll('button');
+        buttons.forEach((btn, idx) => {
+          if (idx === index) {
+            btn.classList.add('ring-4', 'ring-md-sys-color-primary', 'opacity-100');
+            btn.classList.remove('opacity-70', 'hover:opacity-100');
+          } else {
+            btn.classList.remove('ring-4', 'ring-md-sys-color-primary', 'opacity-100');
+            btn.classList.add('opacity-70', 'hover:opacity-100');
+          }
+        });
+      }
+
+      // Generate UI
+      normalScenes.forEach((item, index) => {
+        const btn = document.createElement('button');
+        btn.className = `flex-shrink-0 w-24 h-16 rounded-lg bg-cover bg-center transition-all duration-200 border border-gray-200 shadow-sm opacity-70 hover:opacity-100 focus:outline-none`;
+        btn.style.backgroundImage = `url('${item.thumb}')`;
+        btn.title = item.name;
+        btn.onclick = () => loadNormalScene(index);
+
+        // Label overlay
+        const span = document.createElement('span');
+        span.className = 'block w-full h-full flex items-end justify-center pb-1 text-xs text-white font-bold drop-shadow-md bg-gradient-to-t from-black/60 to-transparent rounded-lg';
+        span.innerText = item.name;
+        btn.appendChild(span);
+
+        selectorContainer.appendChild(btn);
+      });
+
+      // Initial Load
+      loadNormalScene(0);
+    }
+
+    // --- Point Cloud Viewer (Three.js) ---
+    function initPointCloud() {
+      const container = document.getElementById('viewer-cloud');
+      const selectorContainer = document.getElementById('cloud-selector');
+      if (!container || !selectorContainer) return;
+
+      const scene = new THREE.Scene();
+      scene.background = new THREE.Color('#1A1C1E'); // Match surface
+
+      const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 100);
+      camera.position.set(0, 1, 3);
+
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
+      renderer.setSize(container.clientWidth, container.clientHeight);
+      container.appendChild(renderer.domElement);
+
+      // Create geometry
+      const particles = 15000;
+      const geometry = new THREE.BufferGeometry();
+      const positions = new Float32Array(particles * 3);
+      const colors = new Float32Array(particles * 3);
+      const color = new THREE.Color();
+
+      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+
+      const material = new THREE.PointsMaterial({ size: 0.015, vertexColors: true });
+      const points = new THREE.Points(geometry, material);
+      scene.add(points);
+
+      // Scenes Data
+      const cloudScenes = [
+        { id: 'torus', name: 'Torus', thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Torus.png/320px-Torus.png' },
+        { id: 'sphere', name: 'Sphere', thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Sphere_wireframe.svg/320px-Sphere_wireframe.svg.png' },
+        { id: 'cube', name: 'Cube', thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Necker_cube.svg/320px-Necker_cube.svg.png' }
+      ];
+
+      // Update Geometry Function
+      function updateParticles(type) {
+        const posArray = points.geometry.attributes.position.array;
+        const colArray = points.geometry.attributes.color.array;
+
+        for (let i = 0; i < particles; i++) {
+          let x, y, z;
+
+          if (type === 'torus') {
+            const u = Math.random() * Math.PI * 2;
+            const v = Math.random() * Math.PI * 2;
+            const r = 1.0 + Math.random() * 0.2;
+            x = (2 + r * Math.cos(v)) * Math.cos(u) * 0.5;
+            y = (2 + r * Math.cos(v)) * Math.sin(u) * 0.5;
+            z = r * Math.sin(v) * 0.5;
+
+            // Color based on Y
+            const vy = (y + 1) / 2;
+            color.setHSL(0.6 + (vy * 0.2), 0.8, 0.6);
+
+          } else if (type === 'sphere') {
+            const u = Math.random() * Math.PI * 2;
+            const v = Math.acos(2 * Math.random() - 1);
+            const r = 1.2 + Math.random() * 0.05;
+            x = r * Math.sin(v) * Math.cos(u);
+            y = r * Math.sin(v) * Math.sin(u);
+            z = r * Math.cos(v);
+
+            // Color based on Normal/Position
+            color.setRGB((x + 1.2) / 2.4, (y + 1.2) / 2.4, (z + 1.2) / 2.4);
+
+          } else if (type === 'cube') {
+            x = (Math.random() - 0.5) * 2.5;
+            y = (Math.random() - 0.5) * 2.5;
+            z = (Math.random() - 0.5) * 2.5;
+
+            // Color based on position
+            color.setHSL(Math.abs(x * y * z), 0.7, 0.5);
+          }
+
+          // Update Position Buffer
+          posArray[i * 3] = x;
+          posArray[i * 3 + 1] = y;
+          posArray[i * 3 + 2] = z;
+
+          // Update Color Buffer
+          colArray[i * 3] = color.r;
+          colArray[i * 3 + 1] = color.g;
+          colArray[i * 3 + 2] = color.b;
+        }
+
+        points.geometry.attributes.position.needsUpdate = true;
+        points.geometry.attributes.color.needsUpdate = true;
+      }
+
+      function loadCloudScene(index) {
+        updateParticles(cloudScenes[index].id);
+
+        // Update UI
+        const buttons = selectorContainer.querySelectorAll('button');
+        buttons.forEach((btn, idx) => {
+          if (idx === index) {
+            btn.classList.add('ring-4', 'ring-md-sys-color-primary', 'opacity-100');
+            btn.classList.remove('opacity-70', 'hover:opacity-100');
+          } else {
+            btn.classList.remove('ring-4', 'ring-md-sys-color-primary', 'opacity-100');
+            btn.classList.add('opacity-70', 'hover:opacity-100');
+          }
+        });
+      }
+
+      // Generate UI
+      cloudScenes.forEach((item, index) => {
+        const btn = document.createElement('button');
+        btn.className = `flex-shrink-0 w-24 h-16 rounded-lg bg-cover bg-center transition-all duration-200 border border-gray-200 shadow-sm opacity-70 hover:opacity-100 focus:outline-none bg-white`;
+        btn.style.backgroundImage = `url('${item.thumb}')`;
+        btn.style.backgroundSize = 'contain';
+        btn.style.backgroundRepeat = 'no-repeat';
+        btn.title = item.name;
+        btn.onclick = () => loadCloudScene(index);
+
+        // Label overlay
+        const span = document.createElement('span');
+        span.className = 'block w-full h-full flex items-end justify-center pb-1 text-xs text-gray-800 font-bold drop-shadow-sm bg-gradient-to-t from-white/90 to-transparent rounded-lg';
+        span.innerText = item.name;
+        btn.appendChild(span);
+
+        selectorContainer.appendChild(btn);
+      });
+
+      // Initial Load
+      loadCloudScene(0);
+
+      const controls = new THREE.OrbitControls(camera, renderer.domElement);
+      controls.enableDamping = true;
+
+      function animate() {
+        requestAnimationFrame(animate);
+        points.rotation.y += 0.002;
+        points.rotation.x += 0.001;
+        controls.update();
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener('resize', () => {
+        if (container.clientWidth > 0 && container.clientHeight > 0) {
+          camera.aspect = container.clientWidth / container.clientHeight;
+          camera.updateProjectionMatrix();
+          renderer.setSize(container.clientWidth, container.clientHeight);
+        }
+      });
+    }
+
+    // Initialize when DOM is ready
+    document.addEventListener('DOMContentLoaded', () => {
+      init360();
+      initNormals();
+      initPointCloud();
+    });
+  </script>
+</body>
+
+</html>
