@@ -18,10 +18,15 @@
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="assets/css/style.css">
+
   <!-- Three.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
 
+  <!-- JS -->
+  <script src="assets/js/script.js"></script>
   <!-- Material Design 3 Theme Config -->
   <script>
     tailwind.config = {
@@ -96,56 +101,6 @@
       font-family: 'Google Sans', sans-serif;
     }
 
-    /* Material Slider (Comparison) */
-    .comparison-view {
-      position: relative;
-      width: 100%;
-      height: 400px;
-      overflow: hidden;
-      border-radius: 1.5rem;
-      cursor: col-resize;
-      touch-action: none;
-    }
-
-    .comparison-image {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-size: cover;
-      background-position: center;
-    }
-
-    .comparison-handle {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 4px;
-      background: #FFFFFF;
-      z-index: 10;
-      pointer-events: none;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-    }
-
-    .comparison-knob {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      width: 48px;
-      height: 48px;
-      background: #D1E4FF;
-      /* Primary Container */
-      color: #001D36;
-      /* On Primary Container */
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
     /* 3D Canvas Styles */
     .canvas-container {
       width: 100%;
@@ -154,6 +109,47 @@
       border-radius: 1.5rem;
       overflow: hidden;
       position: relative;
+    }
+
+    /* Split-screen Viewer */
+    .split-viewer {
+      width: 100%;
+      height: 500px;
+      background: #1A1C1E;
+      border-radius: 1.5rem;
+      overflow: hidden;
+      position: relative;
+      display: flex;
+    }
+
+    .viewer-half {
+      width: 50%;
+      height: 100%;
+      position: relative;
+      border-right: 2px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .viewer-half:last-child {
+      border-right: none;
+    }
+
+    .viewer-label {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      background: rgba(0, 0, 0, 0.6);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 10;
+      backdrop-filter: blur(4px);
+    }
+
+    .viewer-half:last-child .viewer-label {
+      left: auto;
+      right: 12px;
     }
 
     /* Code Block Styling */
@@ -198,43 +194,43 @@
       <div class="flex flex-wrap justify-center gap-x-8 gap-y-3 text-lg leading-relaxed">
         <span
           class="group relative cursor-pointer font-medium text-md-sys-color-primary inline-flex items-center gap-2">
-          <img src="images/thumbs/vukasin.png" alt="Vukasin Bozic"
+          <img src="assets/images/thumbs/vukasin.png" alt="Vukasin Bozic"
             class="w-10 h-10 rounded-md border border-gray-200 shadow-sm bg-gray-100">
           Vukasin Bozic¹
         </span>
         <span
           class="group relative cursor-pointer font-medium text-md-sys-color-primary inline-flex items-center gap-2">
-          <img src="images/thumbs/isidora.png" alt="Isidora Slavkovic"
+          <img src="assets/images/thumbs/isidora.png" alt="Isidora Slavkovic"
             class="w-10 h-10 rounded-md border border-gray-200 shadow-sm bg-gray-100">
           Isidora Slavkovic²
         </span>
         <span
           class="group relative cursor-pointer font-medium text-md-sys-color-primary inline-flex items-center gap-2">
-          <img src="images/thumbs/dominik.png" alt="Dominik Narnhofer"
+          <img src="assets/images/thumbs/dominik.png" alt="Dominik Narnhofer"
             class="w-10 h-10 rounded-md border border-gray-200 shadow-sm bg-gray-100">
           Dominik Narnhofer¹
         </span>
         <span
           class="group relative cursor-pointer font-medium text-md-sys-color-primary inline-flex items-center gap-2">
-          <img src="images/thumbs/nando.png" alt="Nando Metzger"
+          <img src="assets/images/thumbs/nando.png" alt="Nando Metzger"
             class="w-10 h-10 rounded-md border border-gray-200 shadow-sm bg-gray-100">
           Nando Metzger¹
         </span>
         <span
           class="group relative cursor-pointer font-medium text-md-sys-color-primary inline-flex items-center gap-2">
-          <img src="images/thumbs/denis.png" alt="Denis Rozumny"
+          <img src="assets/images/thumbs/denis.png" alt="Denis Rozumny"
             class="w-10 h-10 rounded-md border border-gray-200 shadow-sm bg-gray-100">
           Denis Rozumny¹
         </span>
         <span
           class="group relative cursor-pointer font-medium text-md-sys-color-primary inline-flex items-center gap-2">
-          <img src="images/thumbs/konrad.png" alt="Konrad Schindler"
+          <img src="assets/images/thumbs/konrad.png" alt="Konrad Schindler"
             class="w-10 h-10 rounded-md border border-gray-200 shadow-sm bg-gray-100">
           Konrad Schindler¹
         </span>
         <span
           class="group relative cursor-pointer font-medium text-md-sys-color-primary inline-flex items-center gap-2">
-          <img src="images/thumbs/nikolai.png" alt="Nikolai Kalischek"
+          <img src="assets/images/thumbs/nikolai.png" alt="Nikolai Kalischek"
             class="w-10 h-10 rounded-md border border-gray-200 shadow-sm bg-gray-100">
           Nikolai Kalischek²
         </span>
@@ -269,16 +265,9 @@
         </span>
       </div>
 
-      <!-- Hero Image/Video Placeholder -->
-      <div class="relative w-full aspect-video rounded-3xl overflow-hidden shadow-elevation-2 bg-gray-100 mt-12 group">
-        <!-- Replace src with actual teaser video/image -->
-        <img src="https://picsum.photos/seed/panorama_hero/1600/900"
-          class="w-full h-full object-cover transition duration-700 group-hover:scale-105" alt="Teaser">
-        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-          <div class="bg-black/40 backdrop-blur-sm text-white px-6 py-3 rounded-2xl border border-white/20">
-            <span class="font-medium">Teaser Video Placeholder</span>
-          </div>
-        </div>
+      <div class="relative h-full rounded-3xl overflow-hidden shadow-elevation-2 bg-gray-100 mt-12 group">
+        <!-- Teaser Video -->
+        <video src="assets/videos/teaser.mp4" autoplay muted controls></video>
       </div>
     </section>
 
@@ -314,7 +303,7 @@
       <div class="bg-white rounded-3xl overflow-hidden shadow-elevation-1 border border-md-sys-color-outline/20">
         <div class="bg-white flex items-center justify-center relative">
           <!-- Replace with actual method diagram -->
-          <img src="images/data/model.png" class="p-8 w-xl object-cover" alt="Method Figure">
+          <img src="assets/images/data/model.png" class="p-8 w-xl object-cover" alt="Method Figure">
         </div>
         <div class="bg-gray-100 p-8">
           <div class="grid md:grid-cols-3 gap-8">
@@ -350,87 +339,59 @@
 
       <div class="space-y-12">
 
-        <!-- 1. 360 Depth Viewer -->
+        <!-- 1. Depth Comparison Viewer -->
         <div
           class="bg-md-sys-color-surface p-1 rounded-3xl shadow-elevation-1 border border-md-sys-color-outline/20 overflow-hidden">
           <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-md-sys-color-surface">
             <div>
               <h3 class="text-xl font-bold text-md-sys-color-onSurface flex items-center gap-2">
-                <span class="material-icons-round text-md-sys-color-tertiary">360</span> Panoramic Depth
+                <span class="material-icons-round text-md-sys-color-tertiary">360</span> Depth Comparison
               </h3>
-              <p class="text-sm text-md-sys-color-onSurfaceVariant">Select a scene to visualize depth geometry.</p>
+              <p class="text-sm text-md-sys-color-onSurfaceVariant">Select a scene and compare against competitors.</p>
             </div>
             <span
               class="bg-md-sys-color-tertiaryContainer text-md-sys-color-onTertiaryContainer text-xs font-bold px-3 py-1 rounded-full">Interactive</span>
           </div>
 
-          <!-- Scene Carousel -->
-          <div class="px-6 pt-4 bg-md-sys-color-surface/50">
-            <div id="scene-selector" class="flex gap-4 overflow-x-auto no-scrollbar p-2">
+          <!-- Example Selector -->
+          <div class="px-6 pt-4 bg-md-sys-color-surface/50 border-b border-gray-100">
+            <p class="text-xs text-md-sys-color-onSurfaceVariant mb-2 font-medium">Scenes</p>
+            <div id="depth-example-selector" class="flex gap-4 overflow-x-auto no-scrollbar p-2">
+              <!-- Examples injected by JS -->
+            </div>
+          </div>
+
+          <!-- Competitor Selector -->
+          <div class="px-6 pt-4 bg-md-sys-color-surface/50 border-b border-gray-100">
+            <p class="text-xs text-md-sys-color-onSurfaceVariant mb-2 font-medium">Competitor (Right Side)</p>
+            <div id="depth-competitor-selector" class="flex gap-4 overflow-x-auto no-scrollbar p-2">
+              <!-- Competitors injected by JS -->
+            </div>
+          </div>
+
+          <!-- Split Screen Viewer -->
+          <div id="viewer-depth-split" class="split-viewer"></div>
+        </div>
+
+        <!-- Point Cloud -->
+        <div class="bg-white p-1 rounded-3xl shadow-elevation-1 border border-md-sys-color-outline/20">
+          <div class="p-6 border-b border-gray-100 bg-white rounded-t-3xl">
+            <h3 class="text-xl font-bold text-md-sys-color-onSurface flex items-center gap-2">
+              <span class="material-icons-round text-md-sys-color-secondary">view_in_ar</span> 3D Point Cloud
+            </h3>
+            <p class="text-sm text-md-sys-color-onSurfaceVariant">Reconstructed geometry from depth.</p>
+          </div>
+
+          <!-- Point Cloud Carousel (Added) -->
+          <div class="px-6 pt-4 bg-white/50">
+            <div id="cloud-selector" class="flex gap-4 overflow-x-auto no-scrollbar p-2">
               <!-- Thumbnails injected by JS -->
             </div>
           </div>
 
-          <!-- Canvas -->
-          <div id="viewer-360" class="canvas-container" style="height: 500px;"></div>
+          <div id="viewer-cloud" class="canvas-container"></div>
         </div>
 
-        <!-- 2. Normals Comparison & Point Cloud Grid -->
-        <div class="grid lg:grid-cols-2 gap-8">
-
-          <!-- Normals Slider -->
-          <div class="bg-white p-1 rounded-3xl shadow-elevation-1 border border-md-sys-color-outline/20">
-            <div class="p-6 border-b border-gray-100 bg-white rounded-t-3xl">
-              <h3 class="text-xl font-bold text-md-sys-color-onSurface flex items-center gap-2">
-                <span class="material-icons-round text-md-sys-color-primary">compare_arrows</span> Surface Normals
-              </h3>
-              <p class="text-sm text-md-sys-color-onSurfaceVariant">Slide to compare RGB vs Predicted Normals.</p>
-            </div>
-
-            <!-- Normals Carousel (Added) -->
-            <div class="px-6 pt-4 bg-white/50">
-              <div id="normals-selector" class="flex gap-4 overflow-x-auto no-scrollbar p-2">
-                <!-- Thumbnails injected by JS -->
-              </div>
-            </div>
-
-            <div id="slider-normals" class="comparison-view" onmousemove="updateSlider(event, 'slider-normals')"
-              ontouchmove="updateSlider(event, 'slider-normals')">
-              <!-- Background: RGB -->
-              <div id="normals-bg" class="comparison-image"
-                style="background-image: url('https://picsum.photos/id/1033/800/800');"></div>
-              <!-- Foreground: Normals (clipped) -->
-              <div class="comparison-image" id="slider-overlay"
-                style="background-image: url('https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/normal-map.jpg'); width: 50%; border-right: 2px solid white;">
-              </div>
-
-              <div class="comparison-handle" style="left: 50%;">
-                <div class="comparison-knob">
-                  <span class="material-icons-round text-xl">code</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- Point Cloud -->
-          <div class="bg-white p-1 rounded-3xl shadow-elevation-1 border border-md-sys-color-outline/20">
-            <div class="p-6 border-b border-gray-100 bg-white rounded-t-3xl">
-              <h3 class="text-xl font-bold text-md-sys-color-onSurface flex items-center gap-2">
-                <span class="material-icons-round text-md-sys-color-secondary">view_in_ar</span> 3D Point Cloud
-              </h3>
-              <p class="text-sm text-md-sys-color-onSurfaceVariant">Reconstructed geometry from depth.</p>
-            </div>
-
-            <!-- Point Cloud Carousel (Added) -->
-            <div class="px-6 pt-4 bg-white/50">
-              <div id="cloud-selector" class="flex gap-4 overflow-x-auto no-scrollbar p-2">
-                <!-- Thumbnails injected by JS -->
-              </div>
-            </div>
-
-            <div id="viewer-cloud" class="canvas-container"></div>
-          </div>
-        </div>
       </div>
     </section>
 
@@ -456,410 +417,6 @@
     </div>
   </footer>
 
-  <!-- Interactive Logic -->
-  <script>
-    // --- Slider Logic ---
-    function updateSlider(e, id) {
-      const container = document.getElementById(id);
-      const overlay = container.querySelector('#slider-overlay');
-      const handle = container.querySelector('.comparison-handle');
-
-      const rect = container.getBoundingClientRect();
-      // Support touch and mouse
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-
-      let x = clientX - rect.left;
-      x = Math.max(0, Math.min(x, rect.width));
-      const percent = (x / rect.width) * 100;
-
-      overlay.style.width = percent + "%";
-      handle.style.left = percent + "%";
-    }
-
-    // --- 360 Viewer (Three.js) ---
-    function init360() {
-      const container = document.getElementById('viewer-360');
-      const selectorContainer = document.getElementById('scene-selector');
-      if (!container || !selectorContainer) return;
-
-      // Define Scenes (Demo Data)
-      // Using standard equirectangular projections from Wikimedia Commons
-      const scenes = [
-        {
-          id: 'earth',
-          name: 'Indoor',
-          url: 'https://upload.wikimedia.org/wikipedia/commons/f/f0/Equirectangular_projection_SW.jpg',
-          thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f0/Equirectangular_projection_SW.jpg/320px-Equirectangular_projection_SW.jpg'
-        },
-        {
-          id: 'mars',
-          name: 'Outdoor',
-          url: 'https://upload.wikimedia.org/wikipedia/commons/c/c4/Equirectangular_projection_of_Mars_Viking_orbiters_mosaic.jpg',
-          thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c4/Equirectangular_projection_of_Mars_Viking_orbiters_mosaic.jpg/320px-Equirectangular_projection_of_Mars_Viking_orbiters_mosaic.jpg'
-        },
-        {
-          id: 'moon',
-          name: 'Street',
-          url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Cylindrical_Map_of_the_Moon.jpg/1280px-Cylindrical_Map_of_the_Moon.jpg', // Actually Cylindrical but works for demo
-          thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/87/Cylindrical_Map_of_the_Moon.jpg/320px-Cylindrical_Map_of_the_Moon.jpg'
-        }
-      ];
-
-      // Setup Three.js
-      const scene = new THREE.Scene();
-      const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-
-      const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-      renderer.setSize(container.clientWidth, container.clientHeight);
-      container.appendChild(renderer.domElement);
-
-      // Inverted Sphere
-      const geometry = new THREE.SphereGeometry(500, 60, 40);
-      geometry.scale(-1, 1, 1);
-
-      // Initialize material with map: null and color. 
-      // This plus needsUpdate later ensures shader recompilation when texture arrives.
-      const material = new THREE.MeshBasicMaterial({ map: null, color: 0xffffff });
-      const sphere = new THREE.Mesh(geometry, material);
-      scene.add(sphere);
-
-      camera.position.set(0, 0, 0.1);
-
-      const controls = new THREE.OrbitControls(camera, renderer.domElement);
-      controls.enableZoom = false;
-      controls.rotateSpeed = -0.5;
-      controls.autoRotate = true;
-      controls.autoRotateSpeed = 0.5;
-
-      // Texture Loading Logic
-      // IMPORTANT: CrossOrigin must be anonymous for WebGL textures from external URLs
-      const textureLoader = new THREE.TextureLoader();
-      textureLoader.setCrossOrigin('anonymous');
-
-      let currentSceneIndex = 0;
-
-      function loadScene(index) {
-        currentSceneIndex = index;
-        const sceneData = scenes[index];
-
-        // Update Thumbnails UI
-        const buttons = selectorContainer.querySelectorAll('button');
-        buttons.forEach((btn, idx) => {
-          if (idx === index) {
-            btn.classList.add('ring-4', 'ring-md-sys-color-primary', 'opacity-100');
-            btn.classList.remove('opacity-70', 'hover:opacity-100');
-          } else {
-            btn.classList.remove('ring-4', 'ring-md-sys-color-primary', 'opacity-100');
-            btn.classList.add('opacity-70', 'hover:opacity-100');
-          }
-        });
-
-        // Load Texture
-        textureLoader.load(sceneData.url,
-          function (tex) {
-            // Success: Apply texture
-            sphere.material.map = tex;
-            sphere.material.needsUpdate = true;
-          },
-          undefined,
-          function (err) {
-            // Error (e.g. Network/CORS fail): Fallback to grid
-            console.warn("Error loading texture, using fallback grid.", err);
-            const canvas = document.createElement('canvas');
-            canvas.width = 512; canvas.height = 256;
-            const ctx = canvas.getContext('2d');
-
-            // Draw dark background
-            ctx.fillStyle = '#102040';
-            ctx.fillRect(0, 0, 512, 256);
-
-            // Draw Grid
-            ctx.strokeStyle = '#406090';
-            ctx.lineWidth = 2;
-            for (let i = 0; i < 512; i += 32) { ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, 256); ctx.stroke(); }
-            for (let i = 0; i < 256; i += 32) { ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(512, i); ctx.stroke(); }
-
-            // Draw Text
-            ctx.fillStyle = '#ffffff';
-            ctx.font = '20px Arial';
-            ctx.textAlign = 'center';
-            ctx.fillText("Image Load Failed", 256, 128);
-
-            const fallbackTex = new THREE.CanvasTexture(canvas);
-            sphere.material.map = fallbackTex;
-            sphere.material.needsUpdate = true;
-          }
-        );
-      }
-
-      // Generate UI
-      scenes.forEach((item, index) => {
-        const btn = document.createElement('button');
-        btn.className = `flex-shrink-0 w-24 h-16 rounded-lg bg-cover bg-center transition-all duration-200 border border-gray-200 shadow-sm opacity-70 hover:opacity-100 focus:outline-none`;
-        btn.style.backgroundImage = `url('${item.thumb}')`;
-        btn.title = item.name;
-        btn.onclick = () => loadScene(index);
-
-        // Label overlay
-        const span = document.createElement('span');
-        span.className = 'block w-full h-full flex items-end justify-center pb-1 text-xs text-white font-bold drop-shadow-md bg-gradient-to-t from-black/60 to-transparent rounded-lg';
-        span.innerText = item.name;
-        btn.appendChild(span);
-
-        selectorContainer.appendChild(btn);
-      });
-
-      // Initial Load
-      loadScene(0);
-
-      // Animation Loop
-      function animate() {
-        requestAnimationFrame(animate);
-        controls.update();
-        renderer.render(scene, camera);
-      }
-      animate();
-
-      // Handle Resize
-      window.addEventListener('resize', () => {
-        if (container.clientWidth > 0 && container.clientHeight > 0) {
-          camera.aspect = container.clientWidth / container.clientHeight;
-          camera.updateProjectionMatrix();
-          renderer.setSize(container.clientWidth, container.clientHeight);
-        }
-      });
-    }
-
-    // --- Normals Carousel Logic ---
-    function initNormals() {
-      const selectorContainer = document.getElementById('normals-selector');
-      const bgDiv = document.getElementById('normals-bg');
-      const overlayDiv = document.getElementById('slider-overlay');
-
-      if (!selectorContainer || !bgDiv || !overlayDiv) return;
-
-      // Demo Data for Normals Comparison
-      const normalScenes = [
-        {
-          name: 'Indoor',
-          thumb: 'https://picsum.photos/id/1033/320/200',
-          rgb: 'https://picsum.photos/id/1033/800/800',
-          normal: 'https://raw.githubusercontent.com/mrdoob/three.js/master/examples/textures/normal-map.jpg'
-        },
-        {
-          name: 'City',
-          thumb: 'https://picsum.photos/id/1067/320/200',
-          rgb: 'https://picsum.photos/id/1067/800/800',
-          // Using the same normal map placeholder for demo, normally would be distinct
-          normal: 'https://upload.wikimedia.org/wikipedia/commons/2/22/Normal_map_of_a_brick_wall.jpg'
-        },
-        {
-          name: 'Abstract',
-          thumb: 'https://picsum.photos/id/1070/320/200',
-          rgb: 'https://picsum.photos/id/1070/800/800',
-          normal: 'https://upload.wikimedia.org/wikipedia/commons/a/aa/Normal_map.png'
-        }
-      ];
-
-      function loadNormalScene(index) {
-        const scene = normalScenes[index];
-
-        // Update CSS Backgrounds
-        bgDiv.style.backgroundImage = `url('${scene.rgb}')`;
-        overlayDiv.style.backgroundImage = `url('${scene.normal}')`;
-
-        // Update UI State
-        const buttons = selectorContainer.querySelectorAll('button');
-        buttons.forEach((btn, idx) => {
-          if (idx === index) {
-            btn.classList.add('ring-4', 'ring-md-sys-color-primary', 'opacity-100');
-            btn.classList.remove('opacity-70', 'hover:opacity-100');
-          } else {
-            btn.classList.remove('ring-4', 'ring-md-sys-color-primary', 'opacity-100');
-            btn.classList.add('opacity-70', 'hover:opacity-100');
-          }
-        });
-      }
-
-      // Generate UI
-      normalScenes.forEach((item, index) => {
-        const btn = document.createElement('button');
-        btn.className = `flex-shrink-0 w-24 h-16 rounded-lg bg-cover bg-center transition-all duration-200 border border-gray-200 shadow-sm opacity-70 hover:opacity-100 focus:outline-none`;
-        btn.style.backgroundImage = `url('${item.thumb}')`;
-        btn.title = item.name;
-        btn.onclick = () => loadNormalScene(index);
-
-        // Label overlay
-        const span = document.createElement('span');
-        span.className = 'block w-full h-full flex items-end justify-center pb-1 text-xs text-white font-bold drop-shadow-md bg-gradient-to-t from-black/60 to-transparent rounded-lg';
-        span.innerText = item.name;
-        btn.appendChild(span);
-
-        selectorContainer.appendChild(btn);
-      });
-
-      // Initial Load
-      loadNormalScene(0);
-    }
-
-    // --- Point Cloud Viewer (Three.js) ---
-    function initPointCloud() {
-      const container = document.getElementById('viewer-cloud');
-      const selectorContainer = document.getElementById('cloud-selector');
-      if (!container || !selectorContainer) return;
-
-      const scene = new THREE.Scene();
-      scene.background = new THREE.Color('#1A1C1E'); // Match surface
-
-      const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 100);
-      camera.position.set(0, 1, 3);
-
-      const renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setSize(container.clientWidth, container.clientHeight);
-      container.appendChild(renderer.domElement);
-
-      // Create geometry
-      const particles = 15000;
-      const geometry = new THREE.BufferGeometry();
-      const positions = new Float32Array(particles * 3);
-      const colors = new Float32Array(particles * 3);
-      const color = new THREE.Color();
-
-      geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-      geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
-
-      const material = new THREE.PointsMaterial({ size: 0.015, vertexColors: true });
-      const points = new THREE.Points(geometry, material);
-      scene.add(points);
-
-      // Scenes Data
-      const cloudScenes = [
-        { id: 'torus', name: 'Torus', thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Torus.png/320px-Torus.png' },
-        { id: 'sphere', name: 'Sphere', thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Sphere_wireframe.svg/320px-Sphere_wireframe.svg.png' },
-        { id: 'cube', name: 'Cube', thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Necker_cube.svg/320px-Necker_cube.svg.png' }
-      ];
-
-      // Update Geometry Function
-      function updateParticles(type) {
-        const posArray = points.geometry.attributes.position.array;
-        const colArray = points.geometry.attributes.color.array;
-
-        for (let i = 0; i < particles; i++) {
-          let x, y, z;
-
-          if (type === 'torus') {
-            const u = Math.random() * Math.PI * 2;
-            const v = Math.random() * Math.PI * 2;
-            const r = 1.0 + Math.random() * 0.2;
-            x = (2 + r * Math.cos(v)) * Math.cos(u) * 0.5;
-            y = (2 + r * Math.cos(v)) * Math.sin(u) * 0.5;
-            z = r * Math.sin(v) * 0.5;
-
-            // Color based on Y
-            const vy = (y + 1) / 2;
-            color.setHSL(0.6 + (vy * 0.2), 0.8, 0.6);
-
-          } else if (type === 'sphere') {
-            const u = Math.random() * Math.PI * 2;
-            const v = Math.acos(2 * Math.random() - 1);
-            const r = 1.2 + Math.random() * 0.05;
-            x = r * Math.sin(v) * Math.cos(u);
-            y = r * Math.sin(v) * Math.sin(u);
-            z = r * Math.cos(v);
-
-            // Color based on Normal/Position
-            color.setRGB((x + 1.2) / 2.4, (y + 1.2) / 2.4, (z + 1.2) / 2.4);
-
-          } else if (type === 'cube') {
-            x = (Math.random() - 0.5) * 2.5;
-            y = (Math.random() - 0.5) * 2.5;
-            z = (Math.random() - 0.5) * 2.5;
-
-            // Color based on position
-            color.setHSL(Math.abs(x * y * z), 0.7, 0.5);
-          }
-
-          // Update Position Buffer
-          posArray[i * 3] = x;
-          posArray[i * 3 + 1] = y;
-          posArray[i * 3 + 2] = z;
-
-          // Update Color Buffer
-          colArray[i * 3] = color.r;
-          colArray[i * 3 + 1] = color.g;
-          colArray[i * 3 + 2] = color.b;
-        }
-
-        points.geometry.attributes.position.needsUpdate = true;
-        points.geometry.attributes.color.needsUpdate = true;
-      }
-
-      function loadCloudScene(index) {
-        updateParticles(cloudScenes[index].id);
-
-        // Update UI
-        const buttons = selectorContainer.querySelectorAll('button');
-        buttons.forEach((btn, idx) => {
-          if (idx === index) {
-            btn.classList.add('ring-4', 'ring-md-sys-color-primary', 'opacity-100');
-            btn.classList.remove('opacity-70', 'hover:opacity-100');
-          } else {
-            btn.classList.remove('ring-4', 'ring-md-sys-color-primary', 'opacity-100');
-            btn.classList.add('opacity-70', 'hover:opacity-100');
-          }
-        });
-      }
-
-      // Generate UI
-      cloudScenes.forEach((item, index) => {
-        const btn = document.createElement('button');
-        btn.className = `flex-shrink-0 w-24 h-16 rounded-lg bg-cover bg-center transition-all duration-200 border border-gray-200 shadow-sm opacity-70 hover:opacity-100 focus:outline-none bg-white`;
-        btn.style.backgroundImage = `url('${item.thumb}')`;
-        btn.style.backgroundSize = 'contain';
-        btn.style.backgroundRepeat = 'no-repeat';
-        btn.title = item.name;
-        btn.onclick = () => loadCloudScene(index);
-
-        // Label overlay
-        const span = document.createElement('span');
-        span.className = 'block w-full h-full flex items-end justify-center pb-1 text-xs text-gray-800 font-bold drop-shadow-sm bg-gradient-to-t from-white/90 to-transparent rounded-lg';
-        span.innerText = item.name;
-        btn.appendChild(span);
-
-        selectorContainer.appendChild(btn);
-      });
-
-      // Initial Load
-      loadCloudScene(0);
-
-      const controls = new THREE.OrbitControls(camera, renderer.domElement);
-      controls.enableDamping = true;
-
-      function animate() {
-        requestAnimationFrame(animate);
-        points.rotation.y += 0.002;
-        points.rotation.x += 0.001;
-        controls.update();
-        renderer.render(scene, camera);
-      }
-      animate();
-
-      window.addEventListener('resize', () => {
-        if (container.clientWidth > 0 && container.clientHeight > 0) {
-          camera.aspect = container.clientWidth / container.clientHeight;
-          camera.updateProjectionMatrix();
-          renderer.setSize(container.clientWidth, container.clientHeight);
-        }
-      });
-    }
-
-    // Initialize when DOM is ready
-    document.addEventListener('DOMContentLoaded', () => {
-      init360();
-      initNormals();
-      initPointCloud();
-    });
-  </script>
 </body>
 
 </html>
