@@ -24,6 +24,7 @@
   <!-- Three.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/PLYLoader.js"></script>
 
   <!-- JS -->
   <script src="assets/js/script.js"></script>
@@ -80,105 +81,14 @@
     }
   </script>
 
-  <style>
-    body {
-      background-color: #FDFCFF;
-      /* md.sys.color.background */
-      color: #1A1C1E;
-      /* md.sys.color.onSurface */
-    }
 
-    /* Smooth Scrolling */
-    html {
-      scroll-behavior: smooth;
-    }
-
-    /* Typography Override */
-    h1,
-    h2,
-    h3,
-    h4 {
-      font-family: 'Google Sans', sans-serif;
-    }
-
-    /* 3D Canvas Styles */
-    .canvas-container {
-      width: 100%;
-      height: 400px;
-      background: #1A1C1E;
-      border-radius: 1.5rem;
-      overflow: hidden;
-      position: relative;
-    }
-
-    /* Split-screen Viewer */
-    .split-viewer {
-      width: 100%;
-      height: 500px;
-      background: #1A1C1E;
-      border-radius: 1.5rem;
-      overflow: hidden;
-      position: relative;
-      display: flex;
-    }
-
-    .viewer-half {
-      width: 50%;
-      height: 100%;
-      position: relative;
-      border-right: 2px solid rgba(255, 255, 255, 0.2);
-    }
-
-    .viewer-half:last-child {
-      border-right: none;
-    }
-
-    .viewer-label {
-      position: absolute;
-      top: 12px;
-      left: 12px;
-      background: rgba(0, 0, 0, 0.6);
-      color: white;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 600;
-      z-index: 10;
-      backdrop-filter: blur(4px);
-    }
-
-    .viewer-half:last-child .viewer-label {
-      left: auto;
-      right: 12px;
-    }
-
-    /* Code Block Styling */
-    pre {
-      background: #F1F4F9;
-      padding: 1.5rem;
-      border-radius: 1rem;
-      overflow-x: auto;
-      font-family: 'Roboto Mono', monospace;
-      font-size: 0.875rem;
-      color: #1A1C1E;
-    }
-
-    /* Scrollbar hiding for carousel */
-    .no-scrollbar::-webkit-scrollbar {
-      display: none;
-    }
-
-    .no-scrollbar {
-      -ms-overflow-style: none;
-      scrollbar-width: none;
-    }
-  </style>
 </head>
 
 <body class="antialiased">
 
   <!-- Main Content -->
-  <main class="max-w-5xl mx-auto px-4 pt-16 pb-24 space-y-24">
+  <!-- Main Content -->
+  <main class="max-w-4xl mx-auto px-6 pt-12 pb-20 space-y-16">
 
     <!-- Hero Section -->
     <section class="text-center space-y-8">
@@ -246,22 +156,22 @@
       </div>
 
       <!-- Action Buttons -->
-      <div class="flex flex-wrap justify-center gap-4 pt-4">
+      <div class="flex flex-wrap justify-center gap-3 pt-2">
         <a href="#"
-          class="inline-flex items-center px-6 py-3 rounded-full bg-md-sys-color-secondaryContainer text-md-sys-color-onSecondaryContainer font-medium hover:shadow-elevation-1 transition">
-          <span class="material-icons-round mr-2">description</span> arXiv
+          class="inline-flex items-center px-5 py-2.5 rounded-full bg-gray-900 text-white font-medium hover:bg-gray-800 transition shadow-sm text-sm">
+          <span class="material-icons-round mr-2 text-lg">description</span> arXiv
         </a>
         <a href="#"
-          class="inline-flex items-center px-6 py-3 rounded-full bg-md-sys-color-secondaryContainer text-md-sys-color-onSecondaryContainer font-medium hover:shadow-elevation-1 transition">
+          class="inline-flex items-center px-5 py-2.5 rounded-full bg-gray-900 text-white font-medium hover:bg-gray-800 transition shadow-sm text-sm">
           <span class="mr-2 text-lg">🤗</span> HF Demo
         </a>
         <a href="#"
-          class="inline-flex items-center px-6 py-3 rounded-full bg-md-sys-color-secondaryContainer text-md-sys-color-onSecondaryContainer font-medium hover:shadow-elevation-1 transition">
-          <span class="material-icons-round mr-2">code</span> Code
+          class="inline-flex items-center px-5 py-2.5 rounded-full bg-gray-900 text-white font-medium hover:bg-gray-800 transition shadow-sm text-sm">
+          <span class="material-icons-round mr-2 text-lg">code</span> Code
         </a>
         <span
-          class="inline-flex items-center px-6 py-3 rounded-full bg-md-sys-color-surfaceVariant/50 text-md-sys-color-onSurfaceVariant/50 font-medium cursor-not-allowed">
-          <span class="material-icons-round mr-2">dataset</span> Dataset
+          class="inline-flex items-center px-5 py-2.5 rounded-full bg-gray-100 text-gray-400 font-medium cursor-not-allowed text-sm border border-gray-200">
+          <span class="material-icons-round mr-2 text-lg">dataset</span> Dataset
         </span>
       </div>
 
@@ -273,10 +183,9 @@
 
     <!-- Abstract Section -->
     <section id="abstract" class="scroll-mt-24">
-      <div
-        class="bg-md-sys-color-surface p-8 md:p-12 rounded-3xl border border-md-sys-color-surfaceVariant/50 shadow-sm">
-        <h2 class="text-3xl font-bold mb-6 text-md-sys-color-onSurface">Abstract</h2>
-        <p class="text-lg text-md-sys-color-onSurfaceVariant leading-relaxed text-justify">
+      <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm">
+        <h2 class="text-2xl font-bold mb-4 text-gray-900">Abstract</h2>
+        <p class="text-base text-gray-700 leading-7 text-justify">
           Monocular geometry estimation has greatly advanced in recent years and has matured to the point where
           off-the-shelf, foundational models are readily available. Several such models are based on denoising
           diffusion, which has shown a remarkable ability to transfer learned priors from color image generation to
@@ -340,56 +249,109 @@
       <div class="space-y-12">
 
         <!-- 1. Depth Comparison Viewer -->
-        <div
-          class="bg-md-sys-color-surface p-1 rounded-3xl shadow-elevation-1 border border-md-sys-color-outline/20 overflow-hidden">
-          <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-md-sys-color-surface">
+        <div class="bg-white rounded-[2rem] border border-gray-200 shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
             <div>
-              <h3 class="text-xl font-bold text-md-sys-color-onSurface flex items-center gap-2">
-                <span class="material-icons-round text-md-sys-color-tertiary">360</span> Depth Comparison
+              <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <span class="material-icons-round text-blue-600">360</span> Depth Comparison
               </h3>
-              <p class="text-sm text-md-sys-color-onSurfaceVariant">Select a scene and compare against competitors.</p>
+              <!-- <p class="text-xs text-gray-500">Select a scene and compare against competitors.</p> -->
             </div>
             <span
-              class="bg-md-sys-color-tertiaryContainer text-md-sys-color-onTertiaryContainer text-xs font-bold px-3 py-1 rounded-full">Interactive</span>
+              class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Interactive</span>
           </div>
 
-          <!-- Example Selector -->
-          <div class="px-6 pt-4 bg-md-sys-color-surface/50 border-b border-gray-100">
-            <p class="text-xs text-md-sys-color-onSurfaceVariant mb-2 font-medium">Scenes</p>
-            <div id="depth-example-selector" class="flex gap-4 overflow-x-auto no-scrollbar p-2">
-              <!-- Examples injected by JS -->
+          <div class="grid md:grid-cols-[1fr,auto] gap-0 border-b border-gray-100">
+            <!-- Example Selector -->
+            <div class="px-5 py-3 border-r border-gray-100">
+              <p class="text-[10px] text-gray-500 mb-1.5 font-bold uppercase tracking-wider">Scenes</p>
+              <div id="depth-example-selector" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-1"></div>
             </div>
-          </div>
-
-          <!-- Competitor Selector -->
-          <div class="px-6 pt-4 bg-md-sys-color-surface/50 border-b border-gray-100">
-            <p class="text-xs text-md-sys-color-onSurfaceVariant mb-2 font-medium">Competitor (Right Side)</p>
-            <div id="depth-competitor-selector" class="flex gap-4 overflow-x-auto no-scrollbar p-2">
-              <!-- Competitors injected by JS -->
+            <!-- Competitor Selector -->
+            <div class="px-5 py-3 bg-gray-50/30 md:max-w-xs lg:max-w-sm">
+              <p class="text-[10px] text-gray-500 mb-1.5 font-bold uppercase tracking-wider">Competitor</p>
+              <div id="depth-competitor-selector" class="flex gap-2 flex-wrap"></div>
             </div>
           </div>
 
           <!-- Split Screen Viewer -->
-          <div id="viewer-depth-split" class="split-viewer"></div>
+          <div id="viewer-depth-split" class="split-viewer" style="height: 450px; border-radius: 0;"></div>
+        </div>
+
+        <!-- 2. Normal Comparison Viewer -->
+        <div class="bg-white rounded-[2rem] border border-gray-200 shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
+            <div>
+              <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <span class="material-icons-round text-purple-600">compare</span> Normal Comparison
+              </h3>
+            </div>
+            <span
+              class="bg-purple-100 text-purple-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Interactive</span>
+          </div>
+
+          <!-- Controls -->
+          <div class="px-5 py-3 border-b border-gray-100">
+            <p class="text-[10px] text-gray-500 mb-1.5 font-bold uppercase tracking-wider">Scenes</p>
+            <div id="normal-example-selector" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-1"></div>
+          </div>
+
+          <!-- Slider Viewer -->
+          <div id="normal-viewer-wrapper"
+            class="relative w-full h-[400px] bg-gray-900 group select-none overflow-hidden">
+            <!-- Images Container -->
+            <div class="absolute inset-0 w-full h-full">
+              <!-- Competitor Image (Background) -->
+              <img id="normal-viewer-right" src="" class="absolute inset-0 w-full h-full object-cover"
+                alt="Competitor Result">
+
+              <!-- Ours Image (Foreground, clipped) -->
+              <div id="normal-viewer-left-container" class="absolute inset-0 w-1/2 overflow-hidden h-full">
+                <img id="normal-viewer-left" src="" class="absolute top-0 left-0 max-w-none h-full object-cover"
+                  alt="Ours Result">
+              </div>
+            </div>
+
+            <!-- Labels -->
+            <span
+              class="absolute top-4 left-4 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded backdrop-blur-sm tracking-wide">PaGeR
+              (Ours)</span>
+            <span id="normal-label-right"
+              class="absolute top-4 right-4 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded backdrop-blur-sm tracking-wide">Competitor</span>
+
+            <!-- Slider Handle -->
+            <input type="range" min="0" max="100" value="50"
+              class="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-20" id="normal-slider">
+
+            <!-- Visual Line -->
+            <div id="normal-slider-line"
+              class="absolute top-0 bottom-0 left-1/2 w-1 bg-white cursor-ew-resize z-10 shadow-[0_0_10px_rgba(0,0,0,0.5)] flex items-center justify-center pointer-events-none">
+              <div
+                class="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg transform -translate-x-[0.5px]">
+                <span class="material-icons-round text-gray-600 text-sm">code</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- Point Cloud -->
-        <div class="bg-white p-1 rounded-3xl shadow-elevation-1 border border-md-sys-color-outline/20">
-          <div class="p-6 border-b border-gray-100 bg-white rounded-t-3xl">
-            <h3 class="text-xl font-bold text-md-sys-color-onSurface flex items-center gap-2">
-              <span class="material-icons-round text-md-sys-color-secondary">view_in_ar</span> 3D Point Cloud
-            </h3>
-            <p class="text-sm text-md-sys-color-onSurfaceVariant">Reconstructed geometry from depth.</p>
-          </div>
-
-          <!-- Point Cloud Carousel (Added) -->
-          <div class="px-6 pt-4 bg-white/50">
-            <div id="cloud-selector" class="flex gap-4 overflow-x-auto no-scrollbar p-2">
-              <!-- Thumbnails injected by JS -->
+        <div class="bg-white rounded-[2rem] border border-gray-200 shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
+            <div>
+              <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
+                <span class="material-icons-round text-emerald-600">view_in_ar</span> 3D Point Cloud
+              </h3>
             </div>
+            <span
+              class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Interactive</span>
           </div>
 
-          <div id="viewer-cloud" class="canvas-container"></div>
+          <!-- Point Cloud Carousel -->
+          <div class="px-5 py-3 border-b border-gray-100">
+            <div id="cloud-selector" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-1"></div>
+          </div>
+
+          <div id="viewer-cloud" class="split-viewer" style="border-radius: 0;"></div>
         </div>
 
       </div>
@@ -411,8 +373,8 @@
   <!-- Footer -->
   <footer class="bg-md-sys-color-onSurface text-md-sys-color-surface py-12 mt-12">
     <div class="max-w-4xl mx-auto px-4 text-center">
-      <div class="text-xs text-gray-600 border-t border-gray-800 pt-8">
-        <p>&copy; 2026 PaGeR Project. Website template adapted for Material Design 3.</p>
+      <div class="text-xs text-gray-600 pt-8">
+        <p>&copy; 2026 PaGeR.</p>
       </div>
     </div>
   </footer>
