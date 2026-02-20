@@ -1,1 +1,126 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Google+Sans:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons+Round');
 
+body {
+  background-color: #FDFCFF;
+  /* md.sys.color.background */
+  color: #1A1C1E;
+  /* md.sys.color.onSurface */
+  font-family: 'Google Sans', sans-serif;
+}
+
+/* Smooth Scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Typography Override */
+h1,
+h2,
+h3,
+h4 {
+  font-family: 'Google Sans', sans-serif;
+}
+
+/* 3D Canvas Styles */
+.canvas-container {
+  width: 100%;
+  height: 400px;
+  background: #1A1C1E;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Split-screen Viewer */
+.split-viewer {
+  width: 100%;
+  height: 400px;
+  /* Reduced for compactness */
+  background: #0f1011;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+}
+
+/* Ensure no border radius on the viewer itself, controlled by parent container */
+.split-viewer {
+  border-radius: 0 !important;
+}
+
+.viewer-half {
+  width: 50%;
+  height: 100%;
+  position: relative;
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.viewer-half:last-child {
+  border-right: none;
+}
+
+.viewer-label {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  padding: 3px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  z-index: 10;
+  backdrop-filter: blur(4px);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.viewer-half:last-child .viewer-label {
+  left: auto;
+  right: 12px;
+}
+
+/* Code Block Styling */
+pre {
+  background: #F8FAFC;
+  padding: 1.25rem;
+  border-radius: 0.75rem;
+  overflow-x: auto;
+  font-family: 'Roboto Mono', monospace;
+  font-size: 0.8rem;
+  color: #334155;
+  line-height: 1.6;
+}
+
+/* Scrollbar hiding for carousel */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Ensure active thumbs are fully visible */
+/* Ensure active thumbs are fully visible */
+.overflow-x-auto {
+  padding: 6px;
+  /* Space for rings */
+}
+
+#depth-example-selector button,
+#normal-example-selector button,
+#cloud-selector button {
+  margin: 2px;
+  /* Prevent ring overlap */
+}
+
+#depth-example-selector button.ring-2,
+#normal-example-selector button.ring-2,
+#cloud-selector button.ring-2 {
+  z-index: 10;
+  /* box-shadow is handled by Tailwind's ring-* and shadow-* utilities. 
+     Do not override it here or the ring border will disappear. */
+  outline: none;
+}
