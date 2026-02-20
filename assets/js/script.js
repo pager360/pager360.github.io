@@ -68,13 +68,13 @@ function init360() {
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableZoom = false;
     controls.rotateSpeed = -0.5;
-    controls.autoRotate = false; // Start with autoRotate disabled
+    controls.autoRotate = true; // Start with autoRotate enabled
     controls.autoRotateSpeed = 0.5;
 
     // Auto-rotation with inactivity timeout
     let autoRotateTimeout;
     let isUserDragging = false;
-    const INACTIVITY_TIME = 10000; // 10 seconds in milliseconds
+    const INACTIVITY_TIME = 3000; // 3 seconds in milliseconds
 
     function enableAutoRotate() {
       if (!isUserDragging) {
@@ -93,7 +93,7 @@ function init360() {
       isUserDragging = true;
       resetAutoRotateTimer();
     });
-    
+
     renderer.domElement.addEventListener('mouseup', () => {
       isUserDragging = false;
       resetAutoRotateTimer();
@@ -103,7 +103,7 @@ function init360() {
       isUserDragging = true;
       resetAutoRotateTimer();
     });
-    
+
     renderer.domElement.addEventListener('touchend', () => {
       isUserDragging = false;
       resetAutoRotateTimer();
@@ -176,11 +176,11 @@ function init360() {
     const buttons = exampleSelector.querySelectorAll('button');
     buttons.forEach((btn, idx) => {
       if (idx === exampleIndex) {
-        btn.classList.add('ring-4', 'ring-md-sys-color-primary', 'opacity-100');
-        btn.classList.remove('opacity-70', 'hover:opacity-100');
+        btn.classList.add('ring-2', 'ring-blue-600', 'opacity-100', 'shadow-md');
+        btn.classList.remove('opacity-70', 'hover:opacity-100', 'shadow-sm');
       } else {
-        btn.classList.remove('ring-4', 'ring-md-sys-color-primary', 'opacity-100');
-        btn.classList.add('opacity-70', 'hover:opacity-100');
+        btn.classList.remove('ring-2', 'ring-blue-600', 'opacity-100', 'shadow-md');
+        btn.classList.add('opacity-70', 'hover:opacity-100', 'shadow-sm');
       }
     });
   }
@@ -210,11 +210,11 @@ function init360() {
     const buttons = competitorSelector.querySelectorAll('button');
     buttons.forEach((btn, idx) => {
       if (idx === competitorIndex) {
-        btn.classList.add('ring-4', 'ring-md-sys-color-primary', 'opacity-100');
-        btn.classList.remove('opacity-70', 'hover:opacity-100');
+        btn.classList.remove('bg-white', 'text-gray-700', 'border-gray-300', 'hover:bg-gray-50');
+        btn.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
       } else {
-        btn.classList.remove('ring-4', 'ring-md-sys-color-primary', 'opacity-100');
-        btn.classList.add('opacity-70', 'hover:opacity-100');
+        btn.classList.add('bg-white', 'text-gray-700', 'border-gray-300', 'hover:bg-gray-50');
+        btn.classList.remove('bg-blue-600', 'text-white', 'border-blue-600');
       }
     });
   }
@@ -256,13 +256,13 @@ function init360() {
   // Generate Example UI
   examples.forEach((item, index) => {
     const btn = document.createElement('button');
-    btn.className = `flex-shrink-0 w-24 h-16 rounded-lg bg-cover bg-center transition-all duration-200 border border-gray-200 shadow-sm opacity-70 hover:opacity-100 focus:outline-none`;
+    btn.className = `flex-shrink-0 w-20 h-14 rounded-md bg-cover bg-center transition-all duration-200 border border-gray-200 shadow-sm opacity-70 hover:opacity-100 focus:outline-none relative overflow-hidden`;
     btn.style.backgroundImage = `url('${item.path}/rgb.jpg')`;
     btn.title = item.name;
     btn.onclick = () => loadExample(index);
 
     const span = document.createElement('span');
-    span.className = 'block w-full h-full flex items-end justify-center pb-1 text-xs text-white font-bold drop-shadow-md bg-gradient-to-t from-black/60 to-transparent rounded-lg';
+    span.className = 'block w-full h-full flex items-end justify-center pb-1 text-[9px] text-white font-bold drop-shadow-md bg-gradient-to-t from-black/80 to-transparent';
     span.innerText = item.name;
     btn.appendChild(span);
 
@@ -272,11 +272,10 @@ function init360() {
   // Generate Competitor UI (excluding "Ours")
   competitors.forEach((item, index) => {
     const btn = document.createElement('button');
-    btn.className = `flex-shrink-0 px-4 py-2 rounded-lg bg-md-sys-color-secondaryContainer text-md-sys-color-onSecondaryContainer transition-all duration-200 border border-gray-200 shadow-sm opacity-70 hover:opacity-100 focus:outline-none font-medium text-sm`;
+    btn.className = `flex-shrink-0 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider border transition-colors shadow-sm`;
     btn.title = item.name;
     btn.innerText = item.name;
     btn.onclick = () => loadCompetitor(index);
-
     competitorSelector.appendChild(btn);
   });
 
@@ -287,7 +286,7 @@ function init360() {
       currentExample = 0;
       currentCompetitor = 0;
       loadExample(0);
-      
+
       // Reset camera to initial position
       leftViewer.controls.reset();
       rightViewer.controls.reset();
@@ -302,125 +301,346 @@ function init360() {
   loadExample(0);
 }
 
+// --- Normal Comparison (Image Slider) ---
+function initNormalComparison() {
+  const container = document.getElementById('normal-viewer-left-container');
+  if (!container) return;
 
+  const leftImage = document.getElementById('normal-viewer-left');
+  const rightImage = document.getElementById('normal-viewer-right');
+  const slider = document.getElementById('normal-slider');
+  const sliderLine = document.getElementById('normal-slider-line');
+  const exampleSelector = document.getElementById('normal-example-selector');
+  const competitorSelector = document.getElementById('normal-competitor-selector');
+  const rightLabel = document.getElementById('normal-label-right');
+
+  // Define Examples
+  const examples = [
+    { id: 'example_1', name: 'Example 1', path: 'assets/images/data/normals_comparisons/example_1' },
+    { id: 'example_2', name: 'Example 2', path: 'assets/images/data/normals_comparisons/example_2' },
+    { id: 'example_3', name: 'Example 3', path: 'assets/images/data/normals_comparisons/example_3' }
+  ];
+
+  const competitors = [
+    { id: 'mtl', name: 'MTL', file: 'MTL.jpg' }
+    // Add more if available
+  ];
+
+  let currentExample = 0;
+  let currentCompetitor = 0;
+
+  function updateImages() {
+    const example = examples[currentExample];
+    const competitor = competitors[currentCompetitor];
+
+    // Ours is left
+    leftImage.src = `${example.path}/ours.jpg`;
+
+    // Competitor is right
+    rightImage.src = `${example.path}/${competitor.file}`;
+
+    // Update label
+    if (rightLabel) rightLabel.innerText = competitor.name;
+
+    // Update UI Toggles
+    updateUI();
+  }
+
+  function updateUI() {
+    // Example Buttons
+    exampleSelector.innerHTML = '';
+    examples.forEach((item, index) => {
+      const btn = document.createElement('button');
+      btn.className = `flex-shrink-0 w-20 h-14 rounded-md bg-cover bg-center transition-all duration-200 border border-gray-200 shadow-sm opacity-70 hover:opacity-100 focus:outline-none relative overflow-hidden`;
+      btn.style.backgroundImage = `url('${item.path}/rgb.jpg')`;
+      btn.onclick = () => {
+        currentExample = index;
+        updateImages();
+      };
+
+      const span = document.createElement('span');
+      span.className = 'block w-full h-full flex items-end justify-center pb-1 text-[9px] text-white font-bold drop-shadow-md bg-gradient-to-t from-black/80 to-transparent';
+      span.innerText = item.name;
+
+      btn.appendChild(span);
+
+      if (index === currentExample) {
+        btn.classList.add('ring-2', 'ring-purple-600', 'opacity-100', 'shadow-md');
+        btn.classList.remove('opacity-70', 'hover:opacity-100', 'shadow-sm');
+      } else {
+        btn.classList.remove('ring-2', 'ring-purple-600', 'opacity-100', 'shadow-md');
+        btn.classList.add('opacity-70', 'hover:opacity-100', 'shadow-sm');
+      }
+
+      exampleSelector.appendChild(btn);
+    });
+  }
+
+  // Slider Logic
+  if (slider) {
+    slider.addEventListener('input', (e) => {
+      const val = e.target.value;
+      container.style.width = `${val}%`;
+      sliderLine.style.left = `${val}%`;
+    });
+  }
+
+  // Handle Resize and Initial Layout
+  const wrapper = document.getElementById('normal-viewer-wrapper');
+  function updateLayout() {
+    if (wrapper && leftImage) {
+      leftImage.style.width = `${wrapper.clientWidth}px`;
+    }
+  }
+
+  // Initial
+  updateImages();
+  updateLayout();
+
+  // Resize Observer
+  const resizeObserver = new ResizeObserver(() => {
+    updateLayout();
+  });
+  if (wrapper) {
+    resizeObserver.observe(wrapper);
+  }
+}
+
+
+// --- Point Cloud Viewer (Three.js) ---
 // --- Point Cloud Viewer (Three.js) ---
 function initPointCloud() {
   const container = document.getElementById('viewer-cloud');
   const selectorContainer = document.getElementById('cloud-selector');
   if (!container || !selectorContainer) return;
 
-  const scene = new THREE.Scene();
-  scene.background = new THREE.Color('#1A1C1E');
+  // Clear container
+  container.innerHTML = '';
 
-  const camera = new THREE.PerspectiveCamera(50, container.clientWidth / container.clientHeight, 0.1, 100);
-  camera.position.set(0, 1, 3);
+  // Create UI Structure
+  const leftHalf = document.createElement('div');
+  leftHalf.className = 'viewer-half';
+  const leftLabel = document.createElement('div');
+  leftLabel.className = 'viewer-label';
+  leftLabel.innerText = 'Color Point Cloud';
+  leftHalf.appendChild(leftLabel);
 
-  const renderer = new THREE.WebGLRenderer({ antialias: true });
-  renderer.setSize(container.clientWidth, container.clientHeight);
-  container.appendChild(renderer.domElement);
+  const rightHalf = document.createElement('div');
+  rightHalf.className = 'viewer-half';
+  const rightLabel = document.createElement('div');
+  rightLabel.className = 'viewer-label';
+  rightLabel.innerText = 'Normal Point Cloud';
+  rightHalf.appendChild(rightLabel);
 
-  // Create geometry
-  const particles = 15000;
-  const geometry = new THREE.BufferGeometry();
-  const positions = new Float32Array(particles * 3);
-  const colors = new Float32Array(particles * 3);
-  const color = new THREE.Color();
+  container.appendChild(leftHalf);
+  container.appendChild(rightHalf);
 
-  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-  geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3));
+  // Helper to create a viewer instance
+  function createViewer(containerElement) {
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color('#1A1C1E');
 
-  const material = new THREE.PointsMaterial({ size: 0.015, vertexColors: true });
-  const points = new THREE.Points(geometry, material);
-  scene.add(points);
+    const camera = new THREE.PerspectiveCamera(50, containerElement.clientWidth / containerElement.clientHeight, 0.1, 100);
+    camera.position.set(0, 0, 3);
 
-  // Scenes Data
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setSize(containerElement.clientWidth, containerElement.clientHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    containerElement.appendChild(renderer.domElement);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.05;
+    controls.rotateSpeed = 0.5;
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    scene.add(ambientLight);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    dirLight.position.set(1, 2, 3);
+    scene.add(dirLight);
+
+    // Resize Handler
+    const resizeObserver = new ResizeObserver(() => {
+      if (containerElement.clientWidth > 0 && containerElement.clientHeight > 0) {
+        camera.aspect = containerElement.clientWidth / containerElement.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(containerElement.clientWidth, containerElement.clientHeight);
+      }
+    });
+    resizeObserver.observe(containerElement);
+
+    return {
+      scene,
+      camera,
+      renderer,
+      controls,
+      resizeObserver,
+      currentPoints: null,
+      container: containerElement
+    };
+  }
+
+  const leftViewer = createViewer(leftHalf);
+  const rightViewer = createViewer(rightHalf);
+
+  // Sync Controls
+  let isSyncingLeft = false;
+  let isSyncingRight = false;
+
+  leftViewer.controls.addEventListener('change', () => {
+    if (isSyncingRight) return;
+    isSyncingLeft = true;
+    rightViewer.camera.position.copy(leftViewer.camera.position);
+    rightViewer.camera.quaternion.copy(leftViewer.camera.quaternion);
+    rightViewer.controls.target.copy(leftViewer.controls.target);
+    isSyncingLeft = false;
+  });
+
+  rightViewer.controls.addEventListener('change', () => {
+    if (isSyncingLeft) return;
+    isSyncingRight = true;
+    leftViewer.camera.position.copy(rightViewer.camera.position);
+    leftViewer.camera.quaternion.copy(rightViewer.camera.quaternion);
+    leftViewer.controls.target.copy(rightViewer.controls.target);
+    isSyncingRight = false;
+  });
+
+  // Data
   const cloudScenes = [
-    { id: 'torus', name: 'Torus', thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/17/Torus.png/320px-Torus.png' },
-    { id: 'sphere', name: 'Sphere', thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/30/Sphere_wireframe.svg/320px-Sphere_wireframe.svg.png' },
-    { id: 'cube', name: 'Cube', thumb: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e7/Necker_cube.svg/320px-Necker_cube.svg.png' }
+    {
+      id: 'blue_photostudio',
+      name: 'Blue Photostudio',
+      file: 'blue_photostudio.ply',
+      thumb: 'assets/images/data/pointclouds/images/blue_photo_studio.jpg'
+    },
+    {
+      id: 'office2',
+      name: 'Office',
+      file: 'office2_rand2.ply',
+      thumb: 'assets/images/data/pointclouds/images/office_2_rand2.jpg'
+    },
+    {
+      id: 'peppermint_powerplant',
+      name: 'Powerplant',
+      file: 'peppermint_powerplant.ply',
+      thumb: 'assets/images/data/pointclouds/images/peppermint_powerplant_2.jpg'
+    },
+    {
+      id: 'symmetrical_garden',
+      name: 'Garden',
+      file: 'symmetrical_garden.ply',
+      thumb: 'assets/images/data/pointclouds/images/symmetrical_garden_02.jpg'
+    }
   ];
 
-  // Update Geometry Function
-  function updateParticles(type) {
-    const posArray = points.geometry.attributes.position.array;
-    const colArray = points.geometry.attributes.color.array;
+  const loader = new THREE.PLYLoader();
+  const cache = {}; // Cache loaded geometries
 
-    for (let i = 0; i < particles; i++) {
-      let x, y, z;
-
-      if (type === 'torus') {
-        const u = Math.random() * Math.PI * 2;
-        const v = Math.random() * Math.PI * 2;
-        const r = 1.0 + Math.random() * 0.2;
-        x = (2 + r * Math.cos(v)) * Math.cos(u) * 0.5;
-        y = (2 + r * Math.cos(v)) * Math.sin(u) * 0.5;
-        z = r * Math.sin(v) * 0.5;
-
-        const vy = (y + 1) / 2;
-        color.setHSL(0.6 + (vy * 0.2), 0.8, 0.6);
-
-      } else if (type === 'sphere') {
-        const u = Math.random() * Math.PI * 2;
-        const v = Math.acos(2 * Math.random() - 1);
-        const r = 1.2 + Math.random() * 0.05;
-        x = r * Math.sin(v) * Math.cos(u);
-        y = r * Math.sin(v) * Math.sin(u);
-        z = r * Math.cos(v);
-
-        color.setRGB((x + 1.2) / 2.4, (y + 1.2) / 2.4, (z + 1.2) / 2.4);
-
-      } else if (type === 'cube') {
-        x = (Math.random() - 0.5) * 2.5;
-        y = (Math.random() - 0.5) * 2.5;
-        z = (Math.random() - 0.5) * 2.5;
-
-        color.setHSL(Math.abs(x * y * z), 0.7, 0.5);
+  function loadPlyToViewer(viewer, filePath, id) {
+    // Cleanup previous
+    if (viewer.currentPoints) {
+      viewer.scene.remove(viewer.currentPoints);
+      if (viewer.currentPoints.material) viewer.currentPoints.material.dispose();
+      // Only dispose geometry if not cached
+      if (!cache[id] && viewer.currentPoints.geometry) {
+        viewer.currentPoints.geometry.dispose();
       }
-
-      // Update Position Buffer
-      posArray[i * 3] = x;
-      posArray[i * 3 + 1] = y;
-      posArray[i * 3 + 2] = z;
-
-      // Update Color Buffer
-      colArray[i * 3] = color.r;
-      colArray[i * 3 + 1] = color.g;
-      colArray[i * 3 + 2] = color.b;
+      viewer.currentPoints = null;
     }
 
-    points.geometry.attributes.position.needsUpdate = true;
-    points.geometry.attributes.color.needsUpdate = true;
+    // Check cache
+    if (cache[id]) {
+      setupPoints(viewer, cache[id], id);
+      return;
+    }
+
+    viewer.container.style.cursor = 'wait';
+
+    loader.load(
+      filePath,
+      (geometry) => {
+        viewer.container.style.cursor = 'default';
+        cache[id] = geometry;
+        setupPoints(viewer, geometry, id);
+      },
+      undefined,
+      (error) => {
+        console.error('Error loading PLY:', filePath, error);
+        viewer.container.style.cursor = 'default';
+      }
+    );
+  }
+
+  function setupPoints(viewer, geometry, id) {
+    geometry.computeBoundingBox();
+
+    // We only center/scale ONCE per geometry.
+    if (!geometry.userData.centered) {
+      const box = geometry.boundingBox;
+      const center = new THREE.Vector3();
+      box.getCenter(center);
+      geometry.translate(-center.x, -center.y, -center.z);
+
+      const size = new THREE.Vector3();
+      box.getSize(size);
+      const maxDim = Math.max(size.x, size.y, size.z);
+      const scale = 2.0 / maxDim;
+      geometry.scale(scale, scale, scale);
+
+      geometry.userData.centered = true;
+    }
+
+    const material = new THREE.PointsMaterial({
+      size: 0.015,
+      vertexColors: true,
+      sizeAttenuation: true
+    });
+
+    const points = new THREE.Points(geometry, material);
+    // points.rotation.z = -Math.PI / 2;
+    points.rotation.y = -Math.PI / 2; // Align with X axis
+    points.userData = { id: id };
+
+    viewer.scene.add(points);
+    viewer.currentPoints = points;
   }
 
   function loadCloudScene(index) {
-    updateParticles(cloudScenes[index].id);
+    const sceneData = cloudScenes[index];
+    const rgbPath = `assets/images/data/pointclouds/rgb/${sceneData.file}`;
+    const normalPath = `assets/images/data/pointclouds/normal/${sceneData.file}`;
 
     // Update UI
     const buttons = selectorContainer.querySelectorAll('button');
     buttons.forEach((btn, idx) => {
       if (idx === index) {
-        btn.classList.add('ring-4', 'ring-md-sys-color-primary', 'opacity-100');
-        btn.classList.remove('opacity-70', 'hover:opacity-100');
+        btn.classList.add('ring-2', 'ring-emerald-600', 'opacity-100', 'shadow-md');
+        btn.classList.remove('opacity-70', 'hover:opacity-100', 'shadow-sm');
       } else {
-        btn.classList.remove('ring-4', 'ring-md-sys-color-primary', 'opacity-100');
-        btn.classList.add('opacity-70', 'hover:opacity-100');
+        btn.classList.remove('ring-2', 'ring-emerald-600', 'opacity-100', 'shadow-md');
+        btn.classList.add('opacity-70', 'hover:opacity-100', 'shadow-sm');
       }
     });
+
+    // Load to both viewers
+    // We use distinct cache keys for rgb vs normal
+    loadPlyToViewer(leftViewer, rgbPath, sceneData.id + '_rgb');
+    loadPlyToViewer(rightViewer, normalPath, sceneData.id + '_normal');
   }
 
-  // Generate UI
+  // Generate UI Buttons
   cloudScenes.forEach((item, index) => {
     const btn = document.createElement('button');
-    btn.className = `flex-shrink-0 w-24 h-16 rounded-lg bg-cover bg-center transition-all duration-200 border border-gray-200 shadow-sm opacity-70 hover:opacity-100 focus:outline-none bg-white`;
+    btn.className = `flex-shrink-0 w-20 h-14 rounded-md bg-cover bg-center transition-all duration-200 border border-gray-200 shadow-sm opacity-70 hover:opacity-100 focus:outline-none relative overflow-hidden`;
+    // We use a div for the background image to ensure it covers properly
     btn.style.backgroundImage = `url('${item.thumb}')`;
-    btn.style.backgroundSize = 'contain';
-    btn.style.backgroundRepeat = 'no-repeat';
-    btn.title = item.name;
     btn.onclick = () => loadCloudScene(index);
 
     const span = document.createElement('span');
-    span.className = 'block w-full h-full flex items-end justify-center pb-1 text-xs text-gray-800 font-bold drop-shadow-sm bg-gradient-to-t from-white/90 to-transparent rounded-lg';
+    span.className = 'block w-full h-full flex items-end justify-center pb-1 text-[9px] text-white font-bold drop-shadow-md bg-gradient-to-t from-black/80 to-transparent';
     span.innerText = item.name;
+
     btn.appendChild(span);
 
     selectorContainer.appendChild(btn);
@@ -429,29 +649,55 @@ function initPointCloud() {
   // Initial Load
   loadCloudScene(0);
 
-  const controls = new THREE.OrbitControls(camera, renderer.domElement);
-  controls.enableDamping = true;
+  // Animation Loop
+  // Auto-rotate logic
+  let autoRotateTimer;
+  const AUTOROTATE_DELAY = 3000;
 
+  function stopAutoRotate() {
+    clearTimeout(autoRotateTimer);
+    leftViewer.controls.autoRotate = false;
+    rightViewer.controls.autoRotate = false;
+  }
+
+  function startAutoRotate() {
+    leftViewer.controls.autoRotate = true;
+    rightViewer.controls.autoRotate = true;
+  }
+
+  function resetTimer() {
+    stopAutoRotate();
+    autoRotateTimer = setTimeout(startAutoRotate, AUTOROTATE_DELAY);
+  }
+
+  [leftViewer, rightViewer].forEach(viewer => {
+    viewer.controls.autoRotate = true;
+    viewer.controls.autoRotateSpeed = 1.0;
+
+    viewer.renderer.domElement.addEventListener('mousedown', stopAutoRotate);
+    viewer.renderer.domElement.addEventListener('mouseup', resetTimer);
+    viewer.renderer.domElement.addEventListener('touchstart', stopAutoRotate);
+    viewer.renderer.domElement.addEventListener('touchend', resetTimer);
+  });
+
+  // Animation Loop
   function animate() {
     requestAnimationFrame(animate);
-    points.rotation.y += 0.002;
-    points.rotation.x += 0.001;
-    controls.update();
-    renderer.render(scene, camera);
+
+    // Auto-rotate handled by OrbitControls now
+
+    leftViewer.controls.update();
+    leftViewer.renderer.render(leftViewer.scene, leftViewer.camera);
+
+    rightViewer.controls.update();
+    rightViewer.renderer.render(rightViewer.scene, rightViewer.camera);
   }
   animate();
-
-  window.addEventListener('resize', () => {
-    if (container.clientWidth > 0 && container.clientHeight > 0) {
-      camera.aspect = container.clientWidth / container.clientHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(container.clientWidth, container.clientHeight);
-    }
-  });
 }
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
   init360();
+  initNormalComparison();
   initPointCloud();
 });
