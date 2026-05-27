@@ -1,181 +1,74 @@
-// ---  d360 Viewer (Three.js) with Split Screen Comparison ---
-function init360() {
-  const container = document.getElementById('viewer-depth-split');
+// --- Enable mouse-wheel horizontal scrolling on a carousel element ---
+function enableHorizontalWheelScroll(el) {
+  if (!el) return;
+  el.addEventListener('wheel', (e) => {
+    // Translate vertical wheel movement into horizontal scrolling so the
+    // scene carousels can be scrolled with a standard mouse wheel.
+    if (Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+    if (el.scrollWidth <= el.clientWidth) return;
+    e.preventDefault();
+    el.scrollLeft += e.deltaY;
+  }, { passive: false });
+}
+
+// --- Depth Comparison (Image Slider) ---
+function initDepthComparison() {
+  const container = document.getElementById('depth-viewer-left-container');
+  if (!container) return;
+
+  const leftImage = document.getElementById('depth-viewer-left');
+  const rightImage = document.getElementById('depth-viewer-right');
+  const slider = document.getElementById('depth-slider');
+  const sliderLine = document.getElementById('depth-slider-line');
   const exampleSelector = document.getElementById('depth-example-selector');
   const competitorSelector = document.getElementById('depth-competitor-selector');
-  if (!container || !exampleSelector || !competitorSelector) return;
+  const rightLabel = document.getElementById('depth-label-right');
 
   // Define Examples
   const examples = [
-    { id: 'example_1', name: 'Example 1', path: 'assets/images/data/depth_comparisons/example_1' },
-    { id: 'example_2', name: 'Example 2', path: 'assets/images/data/depth_comparisons/example_2' },
-    { id: 'example_3', name: 'Example 3', path: 'assets/images/data/depth_comparisons/example_3' },
-    { id: 'example_4', name: 'Example 4', path: 'assets/images/data/depth_comparisons/example_4' },
-    { id: 'example_5', name: 'Example 5', path: 'assets/images/data/depth_comparisons/example_5' },
-    { id: 'example_6', name: 'Example 6', path: 'assets/images/data/depth_comparisons/example_6' },
+    { id: 'example_1', name: 'Venice', path: 'assets/images/data/depth_comparisons/example_1' },
+    { id: 'example_2', name: 'Johannesburg', path: 'assets/images/data/depth_comparisons/example_2' },
+    { id: 'example_3', name: 'Church', path: 'assets/images/data/depth_comparisons/example_3' },
+    { id: 'example_4', name: 'Living Room', path: 'assets/images/data/depth_comparisons/example_4' },
+    { id: 'example_5', name: 'Matterport3D', path: 'assets/images/data/depth_comparisons/example_5' },
+    { id: 'example_6', name: 'Stanford Lobby', path: 'assets/images/data/depth_comparisons/example_6' },
+    { id: 'example_7', name: 'Franklinstrasse', path: 'assets/images/data/depth_comparisons/example_7' },
+    { id: 'example_8', name: 'Velopalast', path: 'assets/images/data/depth_comparisons/example_8' },
+    { id: 'example_9', name: 'Office', path: 'assets/images/data/depth_comparisons/example_9' },
+    { id: 'example_10', name: 'Conference Room', path: 'assets/images/data/depth_comparisons/example_10' },
+    { id: 'example_11', name: 'Basilica', path: 'assets/images/data/depth_comparisons/example_11' },
+    { id: 'example_12', name: 'Mansion', path: 'assets/images/data/depth_comparisons/example_12' },
   ];
 
+  // We compare against the strongest scale-invariant competitor (DA²) and the
+  // strongest metric-depth competitor (DAP), plus the input RGB panorama.
   const competitors = [
-    { id: 'dreamcube', name: 'DreamCube', file: 'dreamcube.jpg' },
-    { id: 'panda', name: 'Panda', file: 'panda.jpg' },
-    { id: 'unik3d', name: 'Unik3D', file: 'unik3d.jpg' },
+    { id: 'da2', name: 'DA²', file: 'da2.jpg' },
+    { id: 'dap', name: 'DAP', file: 'dap.jpg' },
+    { id: 'rgb', name: 'RGB', file: 'rgb.jpg' },
   ];
 
   let currentExample = 0;
-  let currentCompetitor = 0; // Default to first competitor (DreamCube)
+  let currentCompetitor = 0; // Default to first competitor (DA²)
 
-  // Create split viewer containers
-  const leftHalf = document.createElement('div');
-  leftHalf.className = 'viewer-half';
-  const leftLabel = document.createElement('div');
-  leftLabel.className = 'viewer-label';
-  leftLabel.innerText = 'PaGeR (Ours) - Left Side';
-  leftHalf.appendChild(leftLabel);
+  function updateImages() {
+    const example = examples[currentExample];
+    const competitor = competitors[currentCompetitor];
 
-  const rightHalf = document.createElement('div');
-  rightHalf.className = 'viewer-half';
-  const rightLabel = document.createElement('div');
-  rightLabel.className = 'viewer-label';
-  rightLabel.innerText = competitors[currentCompetitor].name;
-  rightHalf.appendChild(rightLabel);
+    // Ours is left (clipped), competitor is right (background)
+    leftImage.src = `${example.path}/ours.jpg`;
+    rightImage.src = `${example.path}/${competitor.file}`;
 
-  container.appendChild(leftHalf);
-  container.appendChild(rightHalf);
+    if (rightLabel) rightLabel.innerText = competitor.name;
 
-  // Setup Two Three.js Scenes with synced controls
-  const textureLoader = new THREE.TextureLoader();
-  textureLoader.setCrossOrigin('anonymous');
-
-  function createViewer(containerElement) {
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(90, containerElement.clientWidth / containerElement.clientHeight, 0.1, 1000);
-
-    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-    renderer.setSize(containerElement.clientWidth, containerElement.clientHeight);
-    renderer.setClearColor(0x000000, 1);
-    containerElement.appendChild(renderer.domElement);
-
-    // Inverted Sphere
-    const geometry = new THREE.SphereGeometry(500, 60, 40);
-    geometry.scale(-1, 1, 1);
-
-    const material = new THREE.MeshBasicMaterial({ map: null, color: 0xffffff });
-    const sphere = new THREE.Mesh(geometry, material);
-    scene.add(sphere);
-
-    camera.position.set(0, 0, 0.1);
-
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableZoom = false;
-    controls.rotateSpeed = -0.5;
-    controls.autoRotate = true; // Start with autoRotate enabled
-    controls.autoRotateSpeed = 0.5;
-
-    // Auto-rotation with inactivity timeout
-    let autoRotateTimeout;
-    let isUserDragging = false;
-    const INACTIVITY_TIME = 3000; // 3 seconds in milliseconds
-
-    function enableAutoRotate() {
-      if (!isUserDragging) {
-        controls.autoRotate = true;
-      }
-    }
-
-    function resetAutoRotateTimer() {
-      controls.autoRotate = false;
-      clearTimeout(autoRotateTimeout);
-      autoRotateTimeout = setTimeout(enableAutoRotate, INACTIVITY_TIME);
-    }
-
-    // Listen for user drag start/end
-    renderer.domElement.addEventListener('mousedown', () => {
-      isUserDragging = true;
-      resetAutoRotateTimer();
-    });
-
-    renderer.domElement.addEventListener('mouseup', () => {
-      isUserDragging = false;
-      resetAutoRotateTimer();
-    });
-
-    renderer.domElement.addEventListener('touchstart', () => {
-      isUserDragging = true;
-      resetAutoRotateTimer();
-    });
-
-    renderer.domElement.addEventListener('touchend', () => {
-      isUserDragging = false;
-      resetAutoRotateTimer();
-    });
-
-    // Initial timer to enable auto-rotation after 10 seconds
-    autoRotateTimeout = setTimeout(enableAutoRotate, INACTIVITY_TIME);
-
-    // Animation Loop
-    function animate() {
-      requestAnimationFrame(animate);
-      controls.update();
-      renderer.render(scene, camera);
-    }
-    animate();
-
-    // Handle Resize
-    const resizeObserver = new ResizeObserver(() => {
-      if (containerElement.clientWidth > 0 && containerElement.clientHeight > 0) {
-        camera.aspect = containerElement.clientWidth / containerElement.clientHeight;
-        camera.updateProjectionMatrix();
-        renderer.setSize(containerElement.clientWidth, containerElement.clientHeight);
-      }
-    });
-    resizeObserver.observe(containerElement);
-
-    return {
-      scene,
-      sphere,
-      material,
-      renderer,
-      controls,
-      camera,
-      resizeObserver
-    };
+    updateExampleUI();
+    updateCompetitorUI();
   }
 
-  const leftViewer = createViewer(leftHalf);
-  const rightViewer = createViewer(rightHalf);
-
-  // Sync cameras - when left viewer controls change, update right viewer
-  leftViewer.controls.addEventListener('change', () => {
-    rightViewer.camera.position.copy(leftViewer.camera.position);
-    rightViewer.camera.quaternion.copy(leftViewer.camera.quaternion);
-  });
-
-  // Load textures for both viewers
-  function loadExample(exampleIndex) {
-    currentExample = exampleIndex;
-    const example = examples[exampleIndex];
-
-    // Load "Ours" for left side
-    const ourUrl = `${example.path}/ours.jpg`;
-    textureLoader.load(ourUrl,
-      function (tex) {
-        leftViewer.sphere.material.map = tex;
-        leftViewer.sphere.material.needsUpdate = true;
-      },
-      undefined,
-      function (err) {
-        console.error("Error loading ours texture from", ourUrl, err);
-        loadFallbackGrid(leftViewer.sphere.material);
-      }
-    );
-
-    // Load competitor for right side
-    loadCompetitor(currentCompetitor);
-
-    // Update example UI
+  function updateExampleUI() {
     const buttons = exampleSelector.querySelectorAll('button');
     buttons.forEach((btn, idx) => {
-      if (idx === exampleIndex) {
+      if (idx === currentExample) {
         btn.classList.add('ring-2', 'ring-blue-600', 'opacity-100', 'shadow-md');
         btn.classList.remove('opacity-70', 'hover:opacity-100', 'shadow-sm');
       } else {
@@ -185,31 +78,10 @@ function init360() {
     });
   }
 
-  function loadCompetitor(competitorIndex) {
-    currentCompetitor = competitorIndex;
-    const competitor = competitors[competitorIndex];
-    const example = examples[currentExample];
-    const compUrl = `${example.path}/${competitor.file}`;
-
-    // Update right label
-    rightLabel.innerText = competitor.name;
-
-    textureLoader.load(compUrl,
-      function (tex) {
-        rightViewer.sphere.material.map = tex;
-        rightViewer.sphere.material.needsUpdate = true;
-      },
-      undefined,
-      function (err) {
-        console.error("Error loading competitor texture from", compUrl, err);
-        loadFallbackGrid(rightViewer.sphere.material);
-      }
-    );
-
-    // Update competitor UI
+  function updateCompetitorUI() {
     const buttons = competitorSelector.querySelectorAll('button');
     buttons.forEach((btn, idx) => {
-      if (idx === competitorIndex) {
+      if (idx === currentCompetitor) {
         btn.classList.remove('bg-white', 'text-gray-700', 'border-gray-300', 'hover:bg-gray-50');
         btn.classList.add('bg-blue-600', 'text-white', 'border-blue-600');
       } else {
@@ -219,47 +91,16 @@ function init360() {
     });
   }
 
-  function loadFallbackGrid(material) {
-    const canvas = document.createElement('canvas');
-    canvas.width = 512;
-    canvas.height = 256;
-    const ctx = canvas.getContext('2d');
-
-    ctx.fillStyle = '#102040';
-    ctx.fillRect(0, 0, 512, 256);
-
-    ctx.strokeStyle = '#406090';
-    ctx.lineWidth = 2;
-    for (let i = 0; i < 512; i += 32) {
-      ctx.beginPath();
-      ctx.moveTo(i, 0);
-      ctx.lineTo(i, 256);
-      ctx.stroke();
-    }
-    for (let i = 0; i < 256; i += 32) {
-      ctx.beginPath();
-      ctx.moveTo(0, i);
-      ctx.lineTo(512, i);
-      ctx.stroke();
-    }
-
-    ctx.fillStyle = '#ffffff';
-    ctx.font = '20px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText("Image Load Failed", 256, 128);
-
-    const fallbackTex = new THREE.CanvasTexture(canvas);
-    material.map = fallbackTex;
-    material.needsUpdate = true;
-  }
-
   // Generate Example UI
   examples.forEach((item, index) => {
     const btn = document.createElement('button');
     btn.className = `flex-shrink-0 w-20 h-14 rounded-md bg-cover bg-center transition-all duration-200 border border-gray-200 shadow-sm opacity-70 hover:opacity-100 focus:outline-none relative overflow-hidden`;
     btn.style.backgroundImage = `url('${item.path}/rgb.jpg')`;
     btn.title = item.name;
-    btn.onclick = () => loadExample(index);
+    btn.onclick = () => {
+      currentExample = index;
+      updateImages();
+    };
 
     const span = document.createElement('span');
     span.className = 'block w-full h-full flex items-end justify-center pb-1 text-[9px] text-white font-bold drop-shadow-md bg-gradient-to-t from-black/80 to-transparent';
@@ -269,36 +110,50 @@ function init360() {
     exampleSelector.appendChild(btn);
   });
 
-  // Generate Competitor UI (excluding "Ours")
+  // Generate Competitor UI
   competitors.forEach((item, index) => {
     const btn = document.createElement('button');
     btn.className = `flex-shrink-0 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider border transition-colors shadow-sm`;
     btn.title = item.name;
     btn.innerText = item.name;
-    btn.onclick = () => loadCompetitor(index);
+    btn.onclick = () => {
+      currentCompetitor = index;
+      updateImages();
+    };
     competitorSelector.appendChild(btn);
   });
 
-  // Reset button
-  const resetBtn = document.getElementById('depth-reset-btn');
-  if (resetBtn) {
-    resetBtn.onclick = () => {
-      currentExample = 0;
-      currentCompetitor = 0;
-      loadExample(0);
+  // Enable wheel scrolling through the scene carousel
+  enableHorizontalWheelScroll(exampleSelector);
 
-      // Reset camera to initial position
-      leftViewer.controls.reset();
-      rightViewer.controls.reset();
-      leftViewer.camera.position.set(0, 0, 0.1);
-      rightViewer.camera.position.set(0, 0, 0.1);
-      leftViewer.camera.quaternion.set(0, 0, 0, 1);
-      rightViewer.camera.quaternion.set(0, 0, 0, 1);
-    };
+  // Slider Logic
+  if (slider) {
+    slider.addEventListener('input', (e) => {
+      const val = e.target.value;
+      container.style.width = `${val}%`;
+      sliderLine.style.left = `${val}%`;
+    });
+  }
+
+  // Handle Resize and Initial Layout — keep the clipped "ours" image the same
+  // rendered width as the full background so the two halves line up.
+  const wrapper = document.getElementById('depth-viewer-wrapper');
+  function updateLayout() {
+    if (wrapper && leftImage) {
+      leftImage.style.width = `${wrapper.clientWidth}px`;
+    }
   }
 
   // Initial Load
-  loadExample(0);
+  updateImages();
+  updateLayout();
+
+  const resizeObserver = new ResizeObserver(() => {
+    updateLayout();
+  });
+  if (wrapper) {
+    resizeObserver.observe(wrapper);
+  }
 }
 
 // --- Normal Comparison (Image Slider) ---
@@ -316,14 +171,17 @@ function initNormalComparison() {
 
   // Define Examples
   const examples = [
-    { id: 'example_1', name: 'Example 1', path: 'assets/images/data/normals_comparisons/example_1' },
-    { id: 'example_2', name: 'Example 2', path: 'assets/images/data/normals_comparisons/example_2' },
-    { id: 'example_3', name: 'Example 3', path: 'assets/images/data/normals_comparisons/example_3' }
+    { id: 'example_1', name: 'Indoor 1', path: 'assets/images/data/normals_comparisons/example_1' },
+    { id: 'example_2', name: 'Indoor 2', path: 'assets/images/data/normals_comparisons/example_2' },
+    { id: 'example_3', name: 'Indoor 3', path: 'assets/images/data/normals_comparisons/example_3' },
+    { id: 'example_4', name: 'Indoor 4', path: 'assets/images/data/normals_comparisons/example_4' },
+    { id: 'example_5', name: 'Indoor 5', path: 'assets/images/data/normals_comparisons/example_5' },
+    { id: 'example_6', name: 'Balcony', path: 'assets/images/data/normals_comparisons/example_6' }
   ];
 
   const competitors = [
-    { id: 'mtl', name: 'MTL', file: 'MTL.jpg' }
-    // Add more if available
+    { id: 'mtl', name: 'MTL', file: 'MTL.jpg' },
+    { id: 'rgb', name: 'RGB', file: 'rgb.jpg' },
   ];
 
   let currentExample = 0;
@@ -343,38 +201,67 @@ function initNormalComparison() {
     if (rightLabel) rightLabel.innerText = competitor.name;
 
     // Update UI Toggles
-    updateUI();
+    updateExampleUI();
+    updateCompetitorUI();
   }
 
-  function updateUI() {
-    // Example Buttons
-    exampleSelector.innerHTML = '';
-    examples.forEach((item, index) => {
-      const btn = document.createElement('button');
-      btn.className = `flex-shrink-0 w-20 h-14 rounded-md bg-cover bg-center transition-all duration-200 border border-gray-200 shadow-sm opacity-70 hover:opacity-100 focus:outline-none relative overflow-hidden`;
-      btn.style.backgroundImage = `url('${item.path}/rgb.jpg')`;
-      btn.onclick = () => {
-        currentExample = index;
-        updateImages();
-      };
-
-      const span = document.createElement('span');
-      span.className = 'block w-full h-full flex items-end justify-center pb-1 text-[9px] text-white font-bold drop-shadow-md bg-gradient-to-t from-black/80 to-transparent';
-      span.innerText = item.name;
-
-      btn.appendChild(span);
-
-      if (index === currentExample) {
+  function updateExampleUI() {
+    const buttons = exampleSelector.querySelectorAll('button');
+    buttons.forEach((btn, idx) => {
+      if (idx === currentExample) {
         btn.classList.add('ring-2', 'ring-purple-600', 'opacity-100', 'shadow-md');
         btn.classList.remove('opacity-70', 'hover:opacity-100', 'shadow-sm');
       } else {
         btn.classList.remove('ring-2', 'ring-purple-600', 'opacity-100', 'shadow-md');
         btn.classList.add('opacity-70', 'hover:opacity-100', 'shadow-sm');
       }
-
-      exampleSelector.appendChild(btn);
     });
   }
+
+  function updateCompetitorUI() {
+    const buttons = competitorSelector.querySelectorAll('button');
+    buttons.forEach((btn, idx) => {
+      if (idx === currentCompetitor) {
+        btn.classList.remove('bg-white', 'text-gray-700', 'border-gray-300', 'hover:bg-gray-50');
+        btn.classList.add('bg-purple-600', 'text-white', 'border-purple-600');
+      } else {
+        btn.classList.add('bg-white', 'text-gray-700', 'border-gray-300', 'hover:bg-gray-50');
+        btn.classList.remove('bg-purple-600', 'text-white', 'border-purple-600');
+      }
+    });
+  }
+
+  // Generate Example UI
+  examples.forEach((item, index) => {
+    const btn = document.createElement('button');
+    btn.className = `flex-shrink-0 w-20 h-14 rounded-md bg-cover bg-center transition-all duration-200 border border-gray-200 shadow-sm opacity-70 hover:opacity-100 focus:outline-none relative overflow-hidden`;
+    btn.style.backgroundImage = `url('${item.path}/rgb.jpg')`;
+    btn.title = item.name;
+    btn.onclick = () => {
+      currentExample = index;
+      updateImages();
+    };
+
+    const span = document.createElement('span');
+    span.className = 'block w-full h-full flex items-end justify-center pb-1 text-[9px] text-white font-bold drop-shadow-md bg-gradient-to-t from-black/80 to-transparent';
+    span.innerText = item.name;
+    btn.appendChild(span);
+
+    exampleSelector.appendChild(btn);
+  });
+
+  // Generate Competitor UI
+  competitors.forEach((item, index) => {
+    const btn = document.createElement('button');
+    btn.className = `flex-shrink-0 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider border transition-colors shadow-sm`;
+    btn.title = item.name;
+    btn.innerText = item.name;
+    btn.onclick = () => {
+      currentCompetitor = index;
+      updateImages();
+    };
+    competitorSelector.appendChild(btn);
+  });
 
   // Slider Logic
   if (slider) {
@@ -392,6 +279,9 @@ function initNormalComparison() {
       leftImage.style.width = `${wrapper.clientWidth}px`;
     }
   }
+
+  // Enable wheel scrolling through the scene carousel
+  enableHorizontalWheelScroll(exampleSelector);
 
   // Initial
   updateImages();
@@ -646,6 +536,9 @@ function initPointCloud() {
     selectorContainer.appendChild(btn);
   });
 
+  // Enable wheel scrolling through the scene carousel
+  enableHorizontalWheelScroll(selectorContainer);
+
   // Initial Load
   loadCloudScene(0);
 
@@ -697,7 +590,7 @@ function initPointCloud() {
 
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
-  init360();
+  initDepthComparison();
   initNormalComparison();
   initPointCloud();
 });

@@ -441,19 +441,22 @@
           <div class="px-6 py-4 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
             <div>
               <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <span class="material-icons-round text-blue-600">360</span> Depth Comparison
+                <span class="material-icons-round text-blue-600">compare</span> Depth Comparison
               </h3>
-              <!-- <p class="text-xs text-gray-500">Select a scene and compare against competitors.</p> -->
+              <p class="text-xs text-gray-500 mt-1 max-w-md">
+                Drag the slider to compare. We compare PaGeR against the strongest scale-invariant
+                competitor (DA²) and the strongest metric-depth competitor (DAP).
+              </p>
             </div>
             <span
               class="bg-blue-100 text-blue-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Interactive</span>
           </div>
 
-          <div class="grid md:grid-cols-[1fr,auto] gap-0 border-b border-gray-100">
+          <div class="grid md:grid-cols-[minmax(0,1fr),auto] gap-0 border-b border-gray-100">
             <!-- Example Selector -->
-            <div class="px-5 py-3 border-r border-gray-100">
+            <div class="px-5 py-3 border-r border-gray-100 min-w-0 overflow-hidden">
               <p class="text-[10px] text-gray-500 mb-1.5 font-bold uppercase tracking-wider">Scenes</p>
-              <div id="depth-example-selector" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-1"></div>
+              <div id="depth-example-selector" class="flex gap-2.5 overflow-x-auto thin-scrollbar pb-1"></div>
             </div>
             <!-- Competitor Selector -->
             <div class="px-5 py-3 bg-gray-50/30 md:max-w-xs lg:max-w-sm">
@@ -462,8 +465,42 @@
             </div>
           </div>
 
-          <!-- Split Screen Viewer -->
-          <div id="viewer-depth-split" class="split-viewer" style="height: 450px; border-radius: 0;"></div>
+          <!-- Slider Viewer -->
+          <div id="depth-viewer-wrapper"
+            class="relative w-full h-[400px] bg-gray-900 group select-none overflow-hidden">
+            <!-- Images Container -->
+            <div class="absolute inset-0 w-full h-full">
+              <!-- Competitor Image (Background) -->
+              <img id="depth-viewer-right" src="" class="absolute inset-0 w-full h-full object-cover"
+                alt="Competitor Depth">
+
+              <!-- Ours Image (Foreground, clipped) -->
+              <div id="depth-viewer-left-container" class="absolute inset-0 w-1/2 overflow-hidden h-full">
+                <img id="depth-viewer-left" src="" class="absolute top-0 left-0 max-w-none h-full object-cover"
+                  alt="Ours Depth">
+              </div>
+            </div>
+
+            <!-- Labels -->
+            <span
+              class="absolute top-4 left-4 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded backdrop-blur-sm tracking-wide">PaGeR
+              (Ours)</span>
+            <span id="depth-label-right"
+              class="absolute top-4 right-4 bg-black/60 text-white text-[10px] font-bold px-2 py-1 rounded backdrop-blur-sm tracking-wide">Competitor</span>
+
+            <!-- Slider Handle -->
+            <input type="range" min="0" max="100" value="50"
+              class="absolute inset-0 w-full h-full opacity-0 cursor-ew-resize z-20" id="depth-slider">
+
+            <!-- Visual Line -->
+            <div id="depth-slider-line"
+              class="absolute top-0 bottom-0 left-1/2 w-1 bg-white cursor-ew-resize z-10 shadow-[0_0_10px_rgba(0,0,0,0.5)] flex items-center justify-center pointer-events-none">
+              <div
+                class="w-8 h-8 bg-white rounded-full flex items-center justify-center shadow-lg transform -translate-x-[0.5px]">
+                <span class="material-icons-round text-gray-600 text-sm">code</span>
+              </div>
+            </div>
+          </div>
         </div>
 
         <!-- 2. Normal Comparison Viewer -->
@@ -479,9 +516,17 @@
           </div>
 
           <!-- Controls -->
-          <div class="px-5 py-3 border-b border-gray-100">
-            <p class="text-[10px] text-gray-500 mb-1.5 font-bold uppercase tracking-wider">Scenes</p>
-            <div id="normal-example-selector" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-1"></div>
+          <div class="grid md:grid-cols-[minmax(0,1fr),auto] gap-0 border-b border-gray-100">
+            <!-- Example Selector -->
+            <div class="px-5 py-3 border-r border-gray-100 min-w-0 overflow-hidden">
+              <p class="text-[10px] text-gray-500 mb-1.5 font-bold uppercase tracking-wider">Scenes</p>
+              <div id="normal-example-selector" class="flex gap-2.5 overflow-x-auto thin-scrollbar pb-1"></div>
+            </div>
+            <!-- Competitor Selector -->
+            <div class="px-5 py-3 bg-gray-50/30 md:max-w-xs lg:max-w-sm">
+              <p class="text-[10px] text-gray-500 mb-1.5 font-bold uppercase tracking-wider">Competitor</p>
+              <div id="normal-competitor-selector" class="flex gap-2 flex-wrap"></div>
+            </div>
           </div>
 
           <!-- Slider Viewer -->
@@ -536,7 +581,7 @@
 
           <!-- Point Cloud Carousel -->
           <div class="px-5 py-3 border-b border-gray-100">
-            <div id="cloud-selector" class="flex gap-2.5 overflow-x-auto no-scrollbar pb-1"></div>
+            <div id="cloud-selector" class="flex gap-2.5 overflow-x-auto thin-scrollbar pb-1"></div>
           </div>
 
           <div id="viewer-cloud" class="split-viewer" style="border-radius: 0;"></div>
