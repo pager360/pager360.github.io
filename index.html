@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PaGeR: Panorama Geometry Estimation</title>
+  <title>PaGeR: Unified Panoramic Geometry Estimation</title>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -93,11 +93,18 @@
     <!-- Hero Section -->
     <section class="text-center space-y-8">
 
-      <h1 class="text-5xl md:text-7xl font-bold tracking-tight text-md-sys-color-onSurface leading-tight">
-        PaGeR: Panorama Geometry Estimation
-      </h1>
+      <div class="space-y-2">
+        <h1 class="text-6xl md:text-8xl font-bold tracking-tight text-md-sys-color-onSurface leading-none">
+          PaGeR
+        </h1>
+        <p class="text-sm md:text-base font-semibold uppercase tracking-[0.25em] text-md-sys-color-onSurfaceVariant">
+          <span class="text-md-sys-color-onSurface font-bold">Pa</span>noramic
+          <span class="text-md-sys-color-onSurface font-bold">Ge</span>ometry
+          <span class="text-md-sys-color-onSurface font-bold">R</span>econstruction
+        </p>
+      </div>
       <p class="text-2xl md:text-3xl font-light text-md-sys-color-onSurfaceVariant max-w-3xl mx-auto">
-        High-Resolution Depth and Normals using Single-Step Diffusion Models
+        Unified Panoramic Geometry Estimation via Multi-View Foundation Models
       </p>
 
       <!-- Authors -->
@@ -130,7 +137,7 @@
           class="group relative cursor-pointer font-medium text-md-sys-color-primary inline-flex items-center gap-2">
           <img src="assets/images/thumbs/denis.png" alt="Denis Rozumny"
             class="w-10 h-10 rounded-md border border-gray-200 shadow-sm bg-gray-100">
-          Denis Rozumny¹
+          Denis Rozumny³
         </span>
         <span
           class="group relative cursor-pointer font-medium text-md-sys-color-primary inline-flex items-center gap-2">
@@ -153,31 +160,42 @@
         <div class="flex items-center gap-2">
           <span class="material-icons-round text-md-sys-color-secondary">business</span> ²Google
         </div>
+        <div class="flex items-center gap-2">
+          <span class="material-icons-round text-md-sys-color-secondary">business</span> ³Meta
+        </div>
       </div>
 
       <!-- Action Buttons -->
       <div class="flex flex-wrap justify-center gap-3 pt-2">
-        <a href="#"
+        <a href="https://arxiv.org/abs/2605.26368" target="_blank" rel="noopener"
           class="inline-flex items-center px-5 py-2.5 rounded-full bg-gray-900 text-white font-medium hover:bg-gray-800 transition shadow-sm text-sm">
           <span class="material-icons-round mr-2 text-lg">description</span> arXiv
         </a>
-        <a href="#"
+        <a href="https://github.com/prs-eth/PaGeR" target="_blank" rel="noopener"
           class="inline-flex items-center px-5 py-2.5 rounded-full bg-gray-900 text-white font-medium hover:bg-gray-800 transition shadow-sm text-sm">
-          <span class="mr-2 text-lg">🤗</span> HF Demo
+          <span class="fab fa-github mr-2 text-lg"></span> Code
         </a>
-        <a href="#"
+        <a href="https://huggingface.co/spaces/prs-eth/PaGeR" target="_blank" rel="noopener"
           class="inline-flex items-center px-5 py-2.5 rounded-full bg-gray-900 text-white font-medium hover:bg-gray-800 transition shadow-sm text-sm">
-          <span class="material-icons-round mr-2 text-lg">code</span> Code
+          <span class="mr-2 text-lg">🤗</span> Demo
         </a>
-        <span
-          class="inline-flex items-center px-5 py-2.5 rounded-full bg-gray-100 text-gray-400 font-medium cursor-not-allowed text-sm border border-gray-200">
-          <span class="material-icons-round mr-2 text-lg">dataset</span> Dataset
-        </span>
+        <a href="https://huggingface.co/collections/prs-eth/pager-697241d06b3733a6f18e4d39" target="_blank" rel="noopener"
+          class="inline-flex items-center px-5 py-2.5 rounded-full bg-gray-900 text-white font-medium hover:bg-gray-800 transition shadow-sm text-sm">
+          <span class="mr-2 text-lg">🤗</span> Models &amp; Collection
+        </a>
+        <a href="https://huggingface.co/datasets/prs-eth/ZuriPano" target="_blank" rel="noopener"
+          class="inline-flex items-center px-5 py-2.5 rounded-full bg-gray-900 text-white font-medium hover:bg-gray-800 transition shadow-sm text-sm">
+          <span class="material-icons-round mr-2 text-lg">dataset</span> ZüriPano
+        </a>
+        <a href="https://huggingface.co/datasets/prs-eth/PanoInfinigen" target="_blank" rel="noopener"
+          class="inline-flex items-center px-5 py-2.5 rounded-full bg-gray-900 text-white font-medium hover:bg-gray-800 transition shadow-sm text-sm">
+          <span class="material-icons-round mr-2 text-lg">dataset</span> PanoInfinigen
+        </a>
       </div>
 
       <div class="relative h-full rounded-3xl overflow-hidden shadow-elevation-2 bg-gray-100 mt-12 group">
         <!-- Teaser Video -->
-        <video src="assets/videos/teaser.mp4" autoplay muted controls></video>
+        <video src="assets/videos/pager_teaser_website.mp4" autoplay muted loop playsinline controls></video>
       </div>
     </section>
 
@@ -186,19 +204,19 @@
       <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm">
         <h2 class="text-2xl font-bold mb-4 text-gray-900">Abstract</h2>
         <p class="text-base text-gray-700 leading-7 text-justify">
-          Monocular geometry estimation has greatly advanced in recent years and has matured to the point where
-          off-the-shelf, foundational models are readily available. Several such models are based on denoising
-          diffusion, which has shown a remarkable ability to transfer learned priors from color image generation to
-          (image-conditional) geometry reconstruction, by fine-tuning on large synthetic depth datasets. We extend
-          diffusion-based monodepth to the more challenging task of estimating full panoramic 3D geometry.
-          <br><br>
-          We leverage recent advances in panorama generation and diffusion fine-tuning and introduce <strong>PaGeR
-            (Panoramic Geometry Reconstruction)</strong>: a one-step diffusion model trained directly in pixel space,
-          which enables high-resolution prediction of panoramic depth and surface normals, with strong generalization to
-          new, unseen environments. As part of our effort, we introduce a synthetic high-resolution dataset of indoor
-          and outdoor scenes with associated metric depth and surface normals. Extensive experiments show that our model
-          produces coherent, metrically accurate, sharp depth and normal maps, and outperforms prior approaches not only
-          in domain but also in few-shot and zero-shot scenarios.
+          Geometry estimation from perspective images has greatly advanced, maturing to the point where off-the-shelf
+          foundation models are able to reconstruct 3D scene structure not only from multi-view imagery, but even from a
+          single view. A natural extension is 3D reconstruction from panoramas, with the exciting prospect of recovering
+          a full 360-degree scene from a single panoramic image. In this work, we introduce PaGeR (Panoramic Geometry
+          Reconstruction), a framework to lift powerful 3D foundation models designed for perspective imagery to the
+          panorama domain. Our strategy is to start from a pre-trained transformer for 3D reconstruction and turn it into
+          a unified high-performance model that predicts scale-invariant depth, metric depth, surface normals, and sky
+          masks from both perspective and omnidirectional images, in a single forward pass. By keeping architectural
+          changes to a minimum and mixing perspective and panoramic images during training, PaGeR retains the rich 3D
+          prior of the underlying foundation model while learning to also estimate geometrically consistent 360-degree
+          scenes from single panoramas. We extensively test our method in both indoor and outdoor environments and find
+          that it delivers state-of-the-art performance and excellent zero-shot performance across a wide range of
+          scenes.
         </p>
       </div>
     </section>
@@ -211,30 +229,31 @@
 
       <div class="bg-white rounded-3xl overflow-hidden shadow-elevation-1 border border-md-sys-color-outline/20">
         <div class="bg-white flex items-center justify-center relative">
-          <!-- Replace with actual method diagram -->
-          <img src="assets/images/data/model.png" class="p-8 w-xl object-cover" alt="Method Figure">
+          <img src="assets/images/data/method.png" class="p-8 w-full object-contain"
+            alt="PaGeR method overview: an RGB panorama is encoded by a shared backbone whose features drive sky, normals, depth and coarse-metric heads, producing a sky mask, surface normals, scale-invariant depth and metric depth.">
         </div>
         <div class="bg-gray-100 p-8">
           <div class="grid md:grid-cols-3 gap-8">
             <div>
               <h3 class="font-bold text-lg mb-2 text-md-sys-color-primary">Cubemap Projection</h3>
               <p class="text-md-sys-color-onSurfaceVariant text-sm leading-relaxed">
-                We project the equirectangular panorama into a cubemap representation to avoid polar distortion and
-                leverage standard convolutional architectures.
+                The equirectangular panorama is projected into a fixed 6 × 504 × 504 cubemap, avoiding polar distortion
+                and decoupling runtime and memory from the input resolution.
               </p>
             </div>
             <div>
-              <h3 class="font-bold text-lg mb-2 text-md-sys-color-primary">Pixel-Space Diffusion</h3>
+              <h3 class="font-bold text-lg mb-2 text-md-sys-color-primary">Multi-View Foundation Backbone</h3>
               <p class="text-md-sys-color-onSurfaceVariant text-sm leading-relaxed">
-                Unlike latent models, PaGeR operates in pixel space, preserving the high-frequency details essential for
-                accurate normal estimation and depth discontinuities.
+                Rather than a panorama-specific network, PaGeR lifts a perspective 3D foundation model (Depth Anything 3,
+                ViT-Giant) to 360° by treating the six cube faces as a multi-view set, reusing its strong geometry priors.
               </p>
             </div>
             <div>
-              <h3 class="font-bold text-lg mb-2 text-md-sys-color-primary">One-Step Inference</h3>
+              <h3 class="font-bold text-lg mb-2 text-md-sys-color-primary">Multi-Task Heads</h3>
               <p class="text-md-sys-color-onSurfaceVariant text-sm leading-relaxed">
-                Through distillation, we achieve high-quality geometry estimation in a single inference step, making the
-                method computationally efficient for high-resolution outputs.
+                A single forward pass drives four heads — scale-invariant depth, surface normals, sky, and coarse-metric.
+                The coarse-metric head rescales the scale-invariant depth into metric depth in metres, alongside the
+                surface normals and sky mask.
               </p>
             </div>
           </div>
@@ -242,9 +261,178 @@
       </div>
     </section>
 
-    <!-- Interactive Results Section -->
+    <!-- Datasets Section -->
+    <section id="datasets" class="scroll-mt-24">
+      <div class="text-center mb-10">
+        <h2 class="text-3xl font-bold text-md-sys-color-onSurface">Datasets</h2>
+        <p class="text-md-sys-color-onSurfaceVariant mt-2 max-w-2xl mx-auto">
+          To train and benchmark panoramic geometry, we release two complementary datasets.
+        </p>
+      </div>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm">
+          <h3 class="font-bold text-lg mb-2 text-md-sys-color-primary flex items-center gap-2">
+            <span class="material-icons-round text-md-sys-color-secondary">auto_awesome</span> PanoInfinigen
+          </h3>
+          <p class="text-sm text-gray-700 leading-7 text-justify">
+            A large-scale synthetic dataset for high-resolution, general-purpose panoramic geometry. We extend the
+            procedural <strong>Infinigen</strong> pipeline to 360° equirectangular rendering, producing
+            <strong>70,000 panoramas from 20,000 distinct indoor scenes</strong> — from kitchens and bedrooms to natural
+            landscapes — and add <strong>~7,000 outdoor urban panoramas</strong> via the iCity city generator. Every
+            sample is rendered at native <strong>4K</strong> with complete, pixel-perfect ground-truth metric depth and
+            surface normals.
+          </p>
+        </div>
+        <div class="bg-white p-8 rounded-3xl border border-gray-200 shadow-sm">
+          <h3 class="font-bold text-lg mb-2 text-md-sys-color-primary flex items-center gap-2">
+            <span class="material-icons-round text-md-sys-color-secondary">photo_camera</span> ZüriPano
+          </h3>
+          <p class="text-sm text-gray-700 leading-7 text-justify">
+            A real-world outdoor benchmark of <strong>100 panoramic scans across 11 urban locations in Zürich</strong>,
+            captured with a <strong>Leica RTC360</strong> LiDAR scanner at <strong>8K</strong> resolution with an
+            effective range of 130 m. Each panorama comes with a dense, high-accuracy depth map and a validity mask,
+            providing challenging large-scale outdoor geometry that complements the synthetic training data.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Quantitative Results Section -->
+    <section id="quantitative" class="scroll-mt-24">
+      <div class="text-center mb-10">
+        <h2 class="text-3xl font-bold text-md-sys-color-onSurface">Quantitative Results</h2>
+        <p class="text-md-sys-color-onSurfaceVariant mt-2 max-w-2xl mx-auto">
+          From a single panorama and one forward pass, PaGeR sets a new state of the art across scale-invariant depth,
+          metric depth, and surface normals. <span class="font-medium">Best per column in bold.</span>
+        </p>
+      </div>
+
+      <div class="space-y-8">
+
+        <!-- Scale-Invariant Depth -->
+        <div class="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+            <h3 class="text-lg font-bold text-gray-900">Scale-Invariant Depth</h3>
+            <p class="text-sm text-gray-600 mt-1">
+              Depth up to a single global scale (least-squares aligned), on two indoor benchmarks and the outdoor
+              ZüriPano. PaGeR leads every metric, and the gap is largest on real outdoor scenes — where perspective
+              foundation models such as DA² and UniK3D break down.
+            </p>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-right tabular-nums whitespace-nowrap">
+              <thead class="text-gray-600">
+                <tr class="border-b border-gray-200">
+                  <th class="text-left px-4 py-2 font-semibold">Method</th>
+                  <th colspan="3" class="px-4 py-2 font-semibold border-l border-gray-200">Matterport3D360</th>
+                  <th colspan="3" class="px-4 py-2 font-semibold border-l border-gray-200">Stanford2D3DS</th>
+                  <th colspan="3" class="px-4 py-2 font-semibold border-l border-gray-200">ZüriPano</th>
+                </tr>
+                <tr class="text-xs text-gray-500 border-b border-gray-200">
+                  <th class="px-4 py-1.5"></th>
+                  <th class="px-3 py-1.5 border-l border-gray-200">AbsRel↓</th><th class="px-3 py-1.5">RMSE↓</th><th class="px-3 py-1.5">δ₁↑</th>
+                  <th class="px-3 py-1.5 border-l border-gray-200">AbsRel↓</th><th class="px-3 py-1.5">RMSE↓</th><th class="px-3 py-1.5">δ₁↑</th>
+                  <th class="px-3 py-1.5 border-l border-gray-200">AbsRel↓</th><th class="px-3 py-1.5">RMSE↓</th><th class="px-3 py-1.5">δ₁↑</th>
+                </tr>
+              </thead>
+              <tbody class="text-gray-700">
+                <tr class="border-b border-gray-50"><td class="text-left px-4 py-1.5">DreamCube<sup>*</sup></td><td class="px-3 border-l border-gray-100">30.45</td><td class="px-3">108.81</td><td class="px-3">54.26</td><td class="px-3 border-l border-gray-100">28.45</td><td class="px-3">75.30</td><td class="px-3">56.39</td><td class="px-3 border-l border-gray-100">29.57</td><td class="px-3">484.91</td><td class="px-3">53.07</td></tr>
+                <tr class="border-b border-gray-50"><td class="text-left px-4 py-1.5">DepthAnyCamera</td><td class="px-3 border-l border-gray-100">25.62</td><td class="px-3">94.06</td><td class="px-3">68.11</td><td class="px-3 border-l border-gray-100">18.35</td><td class="px-3">53.73</td><td class="px-3">76.23</td><td class="px-3 border-l border-gray-100">21.98</td><td class="px-3">487.66</td><td class="px-3">65.41</td></tr>
+                <tr class="border-b border-gray-50"><td class="text-left px-4 py-1.5">MoGe</td><td class="px-3 border-l border-gray-100">18.12</td><td class="px-3">81.68</td><td class="px-3">77.11</td><td class="px-3 border-l border-gray-100">15.34</td><td class="px-3">49.88</td><td class="px-3">82.52</td><td class="px-3 border-l border-gray-100">19.25</td><td class="px-3">484.18</td><td class="px-3">77.12</td></tr>
+                <tr class="border-b border-gray-50"><td class="text-left px-4 py-1.5">EGformer<sup>*</sup></td><td class="px-3 border-l border-gray-100">16.74</td><td class="px-3">96.15</td><td class="px-3">79.32</td><td class="px-3 border-l border-gray-100">13.64</td><td class="px-3">58.95</td><td class="px-3">84.64</td><td class="px-3 border-l border-gray-100">55.49</td><td class="px-3">721.83</td><td class="px-3">31.21</td></tr>
+                <tr class="border-b border-gray-50"><td class="text-left px-4 py-1.5">DAP</td><td class="px-3 border-l border-gray-100">15.84</td><td class="px-3">85.18</td><td class="px-3">82.44</td><td class="px-3 border-l border-gray-100">9.76</td><td class="px-3">46.69</td><td class="px-3">92.37</td><td class="px-3 border-l border-gray-100">19.86</td><td class="px-3">583.42</td><td class="px-3">72.09</td></tr>
+                <tr class="border-b border-gray-50"><td class="text-left px-4 py-1.5">RPG360</td><td class="px-3 border-l border-gray-100">15.40</td><td class="px-3">79.40</td><td class="px-3">82.40</td><td class="px-3 border-l border-gray-100">11.91</td><td class="px-3">46.60</td><td class="px-3">87.73</td><td class="px-3 border-l border-gray-100">18.27</td><td class="px-3">455.28</td><td class="px-3">78.41</td></tr>
+                <tr class="border-b border-gray-50"><td class="text-left px-4 py-1.5">UniK3D<sup>†</sup></td><td class="px-3 border-l border-gray-100">14.82</td><td class="px-3">69.27</td><td class="px-3">83.67</td><td class="px-3 border-l border-gray-100">9.93</td><td class="px-3">40.69</td><td class="px-3">93.34</td><td class="px-3 border-l border-gray-100">31.00</td><td class="px-3">832.13</td><td class="px-3">38.78</td></tr>
+                <tr class="border-b border-gray-50"><td class="text-left px-4 py-1.5">PanDA<sup>*</sup></td><td class="px-3 border-l border-gray-100">13.84</td><td class="px-3">82.82</td><td class="px-3">84.26</td><td class="px-3 border-l border-gray-100">10.69</td><td class="px-3">55.72</td><td class="px-3">90.73</td><td class="px-3 border-l border-gray-100">24.64</td><td class="px-3">515.48</td><td class="px-3">58.31</td></tr>
+                <tr class="border-b border-gray-50"><td class="text-left px-4 py-1.5">DA²</td><td class="px-3 border-l border-gray-100">11.06</td><td class="px-3">67.72</td><td class="px-3">89.18</td><td class="px-3 border-l border-gray-100">7.64</td><td class="px-3">37.29</td><td class="px-3">95.63</td><td class="px-3 border-l border-gray-100">61.22</td><td class="px-3">869.08</td><td class="px-3">2.17</td></tr>
+                <tr class="bg-md-sys-color-primaryContainer/40 font-bold text-md-sys-color-onSurface"><td class="text-left px-4 py-2">PaGeR (Ours)</td><td class="px-3 border-l border-gray-100">9.67</td><td class="px-3">64.69</td><td class="px-3">90.87</td><td class="px-3 border-l border-gray-100">5.93</td><td class="px-3">35.34</td><td class="px-3">96.10</td><td class="px-3 border-l border-gray-100">9.36</td><td class="px-3">299.61</td><td class="px-3">94.75</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="px-6 py-3 text-xs text-gray-500 border-t border-gray-100">
+            AbsRel / δ₁ in %, RMSE in cm. <sup>*</sup> affine-invariant · <sup>†</sup> optimized with in-domain training.
+          </div>
+        </div>
+
+        <!-- Metric Depth -->
+        <div class="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+            <h3 class="text-lg font-bold text-gray-900">Metric Depth</h3>
+            <p class="text-sm text-gray-600 mt-1">
+              Absolute depth in metres — a far harder setting. PaGeR is best on eight
+              of nine metrics across the three benchmarks.
+            </p>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-right tabular-nums whitespace-nowrap">
+              <thead class="text-gray-600">
+                <tr class="border-b border-gray-200">
+                  <th class="text-left px-4 py-2 font-semibold">Method</th>
+                  <th colspan="3" class="px-4 py-2 font-semibold border-l border-gray-200">Matterport3D360</th>
+                  <th colspan="3" class="px-4 py-2 font-semibold border-l border-gray-200">Stanford2D3DS</th>
+                  <th colspan="3" class="px-4 py-2 font-semibold border-l border-gray-200">ZüriPano</th>
+                </tr>
+                <tr class="text-xs text-gray-500 border-b border-gray-200">
+                  <th class="px-4 py-1.5"></th>
+                  <th class="px-3 py-1.5 border-l border-gray-200">AbsRel↓</th><th class="px-3 py-1.5">RMSE↓</th><th class="px-3 py-1.5">δ₁↑</th>
+                  <th class="px-3 py-1.5 border-l border-gray-200">AbsRel↓</th><th class="px-3 py-1.5">RMSE↓</th><th class="px-3 py-1.5">δ₁↑</th>
+                  <th class="px-3 py-1.5 border-l border-gray-200">AbsRel↓</th><th class="px-3 py-1.5">RMSE↓</th><th class="px-3 py-1.5">δ₁↑</th>
+                </tr>
+              </thead>
+              <tbody class="text-gray-700">
+                <tr class="border-b border-gray-50"><td class="text-left px-4 py-1.5">UniK3D<sup>†</sup></td><td class="px-3 border-l border-gray-100">33.43</td><td class="px-3">143.24</td><td class="px-3">46.48</td><td class="px-3 border-l border-gray-100">24.37</td><td class="px-3">64.71</td><td class="px-3">64.50</td><td class="px-3 border-l border-gray-100">35.81</td><td class="px-3">1345.48</td><td class="px-3">34.86</td></tr>
+                <tr class="border-b border-gray-50"><td class="text-left px-4 py-1.5">RPG360</td><td class="px-3 border-l border-gray-100">29.26</td><td class="px-3">136.99</td><td class="px-3">35.33</td><td class="px-3 border-l border-gray-100">29.35</td><td class="px-3">90.73</td><td class="px-3">17.36</td><td class="px-3 border-l border-gray-100">40.36</td><td class="px-3">772.16</td><td class="px-3">2.14</td></tr>
+                <tr class="border-b border-gray-50"><td class="text-left px-4 py-1.5">DepthAnyCamera</td><td class="px-3 border-l border-gray-100">25.16</td><td class="px-3">132.66</td><td class="px-3">62.25</td><td class="px-3 border-l border-gray-100">17.15</td><td class="px-3">59.29</td><td class="px-3">77.98</td><td class="px-3 border-l border-gray-100">33.23</td><td class="px-3">716.38</td><td class="px-3">37.83</td></tr>
+                <tr class="border-b border-gray-50"><td class="text-left px-4 py-1.5">DAP<sup>‡</sup></td><td class="px-3 border-l border-gray-100">30.16</td><td class="px-3">168.88</td><td class="px-3 font-bold text-gray-900">80.19</td><td class="px-3 border-l border-gray-100">10.97</td><td class="px-3">53.39</td><td class="px-3">90.64</td><td class="px-3 border-l border-gray-100">47.00</td><td class="px-3">839.72</td><td class="px-3">24.02</td></tr>
+                <tr class="bg-md-sys-color-primaryContainer/40 font-medium text-md-sys-color-onSurface"><td class="text-left px-4 py-2 font-semibold">PaGeR<sup>‡</sup> (Ours)</td><td class="px-3 border-l border-gray-100 font-bold text-gray-900">21.83</td><td class="px-3 font-bold text-gray-900">123.48</td><td class="px-3">69.50</td><td class="px-3 border-l border-gray-100 font-bold text-gray-900">10.94</td><td class="px-3 font-bold text-gray-900">45.43</td><td class="px-3 font-bold text-gray-900">90.94</td><td class="px-3 border-l border-gray-100 font-bold text-gray-900">31.97</td><td class="px-3 font-bold text-gray-900">530.85</td><td class="px-3 font-bold text-gray-900">39.30</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="px-6 py-3 text-xs text-gray-500 border-t border-gray-100">
+            AbsRel / δ₁ in %, RMSE in cm. <sup>†</sup> optimized with in-domain training · <sup>‡</sup> separate indoor / outdoor prediction heads.
+          </div>
+        </div>
+
+        <!-- Surface Normals -->
+        <div class="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50">
+            <h3 class="text-lg font-bold text-gray-900">Surface Normals</h3>
+            <p class="text-sm text-gray-600 mt-1">
+              Evaluated on Structured3D against specialist normal estimators trained in-domain. Despite being a single
+              unified model, PaGeR is best on every metric.
+            </p>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm text-right tabular-nums whitespace-nowrap">
+              <thead class="text-gray-600">
+                <tr class="text-xs text-gray-500 border-b border-gray-200">
+                  <th class="text-left px-4 py-2 font-semibold text-sm text-gray-600">Method</th>
+                  <th class="px-4 py-2">Mean↓</th><th class="px-4 py-2">MSE↓</th><th class="px-4 py-2">δ&lt;5°↑</th><th class="px-4 py-2">δ&lt;22.5°↑</th>
+                </tr>
+              </thead>
+              <tbody class="text-gray-700">
+                <tr class="border-b border-gray-50"><td class="text-left px-4 py-1.5">UniFuse</td><td class="px-4">8.25</td><td class="px-4">453.1</td><td class="px-4">76.24</td><td class="px-4">87.55</td></tr>
+                <tr class="border-b border-gray-50"><td class="text-left px-4 py-1.5">PanoFormer</td><td class="px-4">16.92</td><td class="px-4">1053.5</td><td class="px-4">59.13</td><td class="px-4">75.50</td></tr>
+                <tr class="border-b border-gray-50"><td class="text-left px-4 py-1.5">OmniFusion</td><td class="px-4">20.70</td><td class="px-4">832.0</td><td class="px-4">28.51</td><td class="px-4">63.55</td></tr>
+                <tr class="border-b border-gray-50"><td class="text-left px-4 py-1.5">MonoViT</td><td class="px-4">5.92</td><td class="px-4">277.8</td><td class="px-4">78.93</td><td class="px-4">90.58</td></tr>
+                <tr class="border-b border-gray-50"><td class="text-left px-4 py-1.5">HyperSphere</td><td class="px-4">5.79</td><td class="px-4">253.4</td><td class="px-4">78.38</td><td class="px-4">90.73</td></tr>
+                <tr class="border-b border-gray-50"><td class="text-left px-4 py-1.5">MTL</td><td class="px-4">8.98</td><td class="px-4">469.0</td><td class="px-4">72.51</td><td class="px-4">86.02</td></tr>
+                <tr class="border-b border-gray-50"><td class="text-left px-4 py-1.5">PanoNormal</td><td class="px-4">5.56</td><td class="px-4">246.6</td><td class="px-4">79.18</td><td class="px-4">91.01</td></tr>
+                <tr class="bg-md-sys-color-primaryContainer/40 font-bold text-md-sys-color-onSurface"><td class="text-left px-4 py-2">PaGeR (Ours)</td><td class="px-4">5.49</td><td class="px-4">174.9</td><td class="px-4">79.91</td><td class="px-4">92.83</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="px-6 py-3 text-xs text-gray-500 border-t border-gray-100">
+            Mean / MSE are angular errors in degrees; δ&lt;t° is the fraction of pixels within t° of ground truth (%).
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- Qualitative Results Section -->
     <section id="results" class="scroll-mt-24">
-      <h2 class="text-3xl font-bold mb-8 text-md-sys-color-onSurface">Interactive Results</h2>
+      <h2 class="text-3xl font-bold mb-8 text-md-sys-color-onSurface">Qualitative Results</h2>
 
       <div class="space-y-12">
 
@@ -361,10 +549,10 @@
     <section id="citation" class="scroll-mt-24">
       <h2 class="text-2xl font-bold mb-6 text-md-sys-color-onSurface">Citation</h2>
       <pre class="shadow-inner border border-gray-200"><code>@article{bozic2026pager,
-  title={PaGeR: Panorama Geometry Estimation using Single-Step Diffusion Models},
+  title={Unified Panoramic Geometry Estimation via Multi-View Foundation Models},
   author={Bozic, Vukasin and Slavkovic, Isidora and Narnhofer, Dominik and Metzger, Nando and Rozumny, Denis and Schindler, Konrad and Kalischek, Nikolai},
-  journal={arXiv preprint},
-  year={2025}
+  journal={arXiv preprint arXiv:2605.26368},
+  year={2026}
 }</code></pre>
     </section>
 
