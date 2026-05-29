@@ -48,7 +48,8 @@ function initDepthComparison() {
     { id: 'rgb', name: 'RGB', file: 'rgb.jpg' },
   ];
 
-  let currentExample = 0;
+  let currentExample = examples.findIndex(e => e.name === 'Stanford Lobby');
+  if (currentExample < 0) currentExample = 0;
   let currentCompetitor = 0; // Default to first competitor (DA²)
 
   function updateImages() {
@@ -171,12 +172,12 @@ function initNormalComparison() {
 
   // Define Examples
   const examples = [
-    { id: 'example_1', name: 'Indoor 1', path: 'assets/images/data/normals_comparisons/example_1' },
-    { id: 'example_2', name: 'Indoor 2', path: 'assets/images/data/normals_comparisons/example_2' },
-    { id: 'example_3', name: 'Indoor 3', path: 'assets/images/data/normals_comparisons/example_3' },
-    { id: 'example_4', name: 'Indoor 4', path: 'assets/images/data/normals_comparisons/example_4' },
-    { id: 'example_5', name: 'Indoor 5', path: 'assets/images/data/normals_comparisons/example_5' },
-    { id: 'example_6', name: 'Balcony', path: 'assets/images/data/normals_comparisons/example_6' }
+    { id: 'example_1', name: 'Marble Lounge', path: 'assets/images/data/normals_comparisons/example_1' },
+    { id: 'example_2', name: 'Skyline Loft', path: 'assets/images/data/normals_comparisons/example_2' },
+    { id: 'example_3', name: 'Floral Suite', path: 'assets/images/data/normals_comparisons/example_3' },
+    { id: 'example_4', name: 'Wood Apartment', path: 'assets/images/data/normals_comparisons/example_4' },
+    { id: 'example_5', name: 'Sage Bedroom', path: 'assets/images/data/normals_comparisons/example_5' },
+    { id: 'example_6', name: 'Forest Deck', path: 'assets/images/data/normals_comparisons/example_6' }
   ];
 
   const competitors = [
@@ -297,40 +298,63 @@ function initNormalComparison() {
 }
 
 
-// --- Point Cloud Viewer (Three.js) ---
-// --- Point Cloud Viewer (Three.js) ---
-function initPointCloud() {
+// --- Point Cloud Comparison (Three.js + GLB) ---
+function initPointCloudComparison() {
   const container = document.getElementById('viewer-cloud');
   const selectorContainer = document.getElementById('cloud-selector');
-  if (!container || !selectorContainer) return;
+  const competitorSelector = document.getElementById('cloud-competitor-selector');
+  const rgbImage = document.getElementById('cloud-rgb-image');
+  if (!container || !selectorContainer || !competitorSelector) return;
 
-  // Clear container
   container.innerHTML = '';
 
-  // Create UI Structure
+  // Split viewer halves
   const leftHalf = document.createElement('div');
   leftHalf.className = 'viewer-half';
   const leftLabel = document.createElement('div');
   leftLabel.className = 'viewer-label';
-  leftLabel.innerText = 'Color Point Cloud';
+  leftLabel.innerText = 'PaGeR (Ours)';
   leftHalf.appendChild(leftLabel);
 
   const rightHalf = document.createElement('div');
   rightHalf.className = 'viewer-half';
   const rightLabel = document.createElement('div');
   rightLabel.className = 'viewer-label';
-  rightLabel.innerText = 'Normal Point Cloud';
+  rightLabel.innerText = 'Competitor';
   rightHalf.appendChild(rightLabel);
 
   container.appendChild(leftHalf);
   container.appendChild(rightHalf);
 
-  // Helper to create a viewer instance
+  const scenes = [
+    { id: 'PanoInTheWild_venice_sunset', name: 'Venice' },
+    { id: 'PanoInTheWild_livingroom_generated', name: 'Living Room' },
+    { id: 'PanoInTheWild_industrial_generated', name: 'Industrial Hall' },
+    { id: 'PanoInTheWild_20250703_100502_622', name: 'Campus Plaza' },
+    { id: 'PanoInTheWild_19', name: 'Train Station' },
+    { id: 'ZuriPano_Franklinstrasse-_s008', name: 'Franklinstrasse' },
+    { id: 'ZuriPano_Freilagerstrasse-_s010', name: 'Freilagerstrasse' },
+    { id: 'Matterport3D360_1e860d820a754b15a68ec56bd7cdd451', name: 'Pool Terrace' },
+    { id: 'Matterport3D360_7f4f8df6c0de4998992a5f1951a1bb64', name: 'Open-Plan Villa' },
+    { id: 'Matterport3D360_d9f19697d1524359a371bc0435213f43', name: 'Home Office' },
+    { id: 'Matterport3D360_f051a244b87b4fde9575decf98a122cd', name: 'Mansion' },
+    { id: 'Matterport3D360_f65d4fa347954fa0ba90f535f6b9bda3', name: 'Holiday Bedroom' },
+  ];
+
+  const competitors = [
+    { id: 'da2', name: 'DA²', file: 'DA2.glb' },
+    { id: 'dap', name: 'DAP', file: 'DAP.glb' },
+  ];
+
+  let currentScene = scenes.findIndex(s => s.name === 'Franklinstrasse');
+  if (currentScene < 0) currentScene = 0;
+  let currentCompetitor = 0;
+
   function createViewer(containerElement) {
     const scene = new THREE.Scene();
     scene.background = new THREE.Color('#1A1C1E');
 
-    const camera = new THREE.PerspectiveCamera(50, containerElement.clientWidth / containerElement.clientHeight, 0.1, 100);
+    const camera = new THREE.PerspectiveCamera(50, containerElement.clientWidth / containerElement.clientHeight, 0.01, 1000);
     camera.position.set(0, 0, 3);
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -343,14 +367,12 @@ function initPointCloud() {
     controls.dampingFactor = 0.05;
     controls.rotateSpeed = 0.5;
 
-    // Lights
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
     scene.add(ambientLight);
     const dirLight = new THREE.DirectionalLight(0xffffff, 0.8);
     dirLight.position.set(1, 2, 3);
     scene.add(dirLight);
 
-    // Resize Handler
     const resizeObserver = new ResizeObserver(() => {
       if (containerElement.clientWidth > 0 && containerElement.clientHeight > 0) {
         camera.aspect = containerElement.clientWidth / containerElement.clientHeight;
@@ -360,24 +382,14 @@ function initPointCloud() {
     });
     resizeObserver.observe(containerElement);
 
-    return {
-      scene,
-      camera,
-      renderer,
-      controls,
-      resizeObserver,
-      currentPoints: null,
-      container: containerElement
-    };
+    return { scene, camera, renderer, controls, resizeObserver, currentObject: null, container: containerElement };
   }
 
   const leftViewer = createViewer(leftHalf);
   const rightViewer = createViewer(rightHalf);
 
-  // Sync Controls
-  let isSyncingLeft = false;
-  let isSyncingRight = false;
-
+  // Sync the two cameras
+  let isSyncingLeft = false, isSyncingRight = false;
   leftViewer.controls.addEventListener('change', () => {
     if (isSyncingRight) return;
     isSyncingLeft = true;
@@ -386,7 +398,6 @@ function initPointCloud() {
     rightViewer.controls.target.copy(leftViewer.controls.target);
     isSyncingLeft = false;
   });
-
   rightViewer.controls.addEventListener('change', () => {
     if (isSyncingLeft) return;
     isSyncingRight = true;
@@ -396,115 +407,112 @@ function initPointCloud() {
     isSyncingRight = false;
   });
 
-  // Data
-  const cloudScenes = [
-    {
-      id: 'blue_photostudio',
-      name: 'Blue Photostudio',
-      file: 'blue_photostudio.ply',
-      thumb: 'assets/images/data/pointclouds/images/blue_photo_studio.jpg'
-    },
-    {
-      id: 'office2',
-      name: 'Office',
-      file: 'office2_rand2.ply',
-      thumb: 'assets/images/data/pointclouds/images/office_2_rand2.jpg'
-    },
-    {
-      id: 'peppermint_powerplant',
-      name: 'Powerplant',
-      file: 'peppermint_powerplant.ply',
-      thumb: 'assets/images/data/pointclouds/images/peppermint_powerplant_2.jpg'
-    },
-    {
-      id: 'symmetrical_garden',
-      name: 'Garden',
-      file: 'symmetrical_garden.ply',
-      thumb: 'assets/images/data/pointclouds/images/symmetrical_garden_02.jpg'
-    }
-  ];
+  const loader = new THREE.GLTFLoader();
+  const cache = {};
+  // Per-scene normalization (scale + offset) seeded by ours.glb so DAP/DA2
+  // share the same world transform and the manual alignment is preserved.
+  const sceneNorm = {};
 
-  const loader = new THREE.PLYLoader();
-  const cache = {}; // Cache loaded geometries
-
-  function loadPlyToViewer(viewer, filePath, id) {
-    // Cleanup previous
-    if (viewer.currentPoints) {
-      viewer.scene.remove(viewer.currentPoints);
-      if (viewer.currentPoints.material) viewer.currentPoints.material.dispose();
-      // Only dispose geometry if not cached
-      if (!cache[id] && viewer.currentPoints.geometry) {
-        viewer.currentPoints.geometry.dispose();
-      }
-      viewer.currentPoints = null;
+  function loadGlbToViewer(viewer, filePath, key, sceneId) {
+    if (viewer.currentObject) {
+      viewer.scene.remove(viewer.currentObject);
+      viewer.currentObject = null;
     }
 
-    // Check cache
-    if (cache[id]) {
-      setupPoints(viewer, cache[id], id);
-      return;
+    if (cache[key]) {
+      placeObject(viewer, cache[key], sceneId);
+      return Promise.resolve();
     }
 
     viewer.container.style.cursor = 'wait';
-
-    loader.load(
-      filePath,
-      (geometry) => {
-        viewer.container.style.cursor = 'default';
-        cache[id] = geometry;
-        setupPoints(viewer, geometry, id);
-      },
-      undefined,
-      (error) => {
-        console.error('Error loading PLY:', filePath, error);
-        viewer.container.style.cursor = 'default';
-      }
-    );
+    return new Promise((resolve) => {
+      loader.load(filePath,
+        (gltf) => {
+          viewer.container.style.cursor = 'default';
+          cache[key] = gltf.scene;
+          placeObject(viewer, gltf.scene, sceneId);
+          resolve();
+        },
+        undefined,
+        (err) => {
+          console.error('GLB load failed:', filePath, err);
+          viewer.container.style.cursor = 'default';
+          resolve();
+        }
+      );
+    });
   }
 
-  function setupPoints(viewer, geometry, id) {
-    geometry.computeBoundingBox();
+  function placeObject(viewer, root, sceneId) {
+    // Detach from any previous parent (only one viewer holds it at a time).
+    if (root.parent) root.parent.remove(root);
 
-    // We only center/scale ONCE per geometry.
-    if (!geometry.userData.centered) {
-      const box = geometry.boundingBox;
-      const center = new THREE.Vector3();
-      box.getCenter(center);
-      geometry.translate(-center.x, -center.y, -center.z);
-
-      const size = new THREE.Vector3();
-      box.getSize(size);
+    // Compute scene-level normalization ONCE from the first model loaded for
+    // a scene (ours.glb, by call order in loadScene), then reuse for DAP/DA2
+    // so they share the world frame and the manual alignment is preserved.
+    let n = sceneNorm[sceneId];
+    if (!n) {
+      // Reset any cached transform from a previous scene before measuring.
+      root.scale.set(1, 1, 1);
+      root.position.set(0, 0, 0);
+      const box = new THREE.Box3().setFromObject(root);
+      const center = box.getCenter(new THREE.Vector3());
+      const size = box.getSize(new THREE.Vector3());
       const maxDim = Math.max(size.x, size.y, size.z);
-      const scale = 2.0 / maxDim;
-      geometry.scale(scale, scale, scale);
-
-      geometry.userData.centered = true;
+      const s = maxDim > 0 ? 2.0 / maxDim : 1;
+      n = { scale: s, offset: center.clone().multiplyScalar(-s) };
+      sceneNorm[sceneId] = n;
+      console.log('[pcl] seed sceneNorm', sceneId,
+                  'bbox center=', center.toArray().map(v => +v.toFixed(2)),
+                  'size=', size.toArray().map(v => +v.toFixed(2)),
+                  '-> scale=', s.toFixed(4),
+                  'offset=', n.offset.toArray().map(v => +v.toFixed(2)));
+    } else {
+      console.log('[pcl] reuse sceneNorm', sceneId,
+                  'scale=', n.scale.toFixed(4),
+                  'offset=', n.offset.toArray().map(v => +v.toFixed(2)));
     }
+    root.scale.setScalar(n.scale);
+    root.position.copy(n.offset);
 
-    const material = new THREE.PointsMaterial({
-      size: 0.015,
-      vertexColors: true,
-      sizeAttenuation: true
+    // Ensure point primitives are visible and use vertex colors from the GLB.
+    root.traverse(o => {
+      if (o.isPoints && o.material) {
+        o.material.size = 0.01;
+        o.material.sizeAttenuation = true;
+        o.material.vertexColors = true;
+        o.material.needsUpdate = true;
+      }
     });
 
-    const points = new THREE.Points(geometry, material);
-    // points.rotation.z = -Math.PI / 2;
-    points.rotation.y = -Math.PI / 2; // Align with X axis
-    points.userData = { id: id };
-
-    viewer.scene.add(points);
-    viewer.currentPoints = points;
+    viewer.scene.add(root);
+    viewer.currentObject = root;
   }
 
-  function loadCloudScene(index) {
-    const sceneData = cloudScenes[index];
-    const rgbPath = `assets/images/data/pointclouds/rgb/${sceneData.file}`;
-    const normalPath = `assets/images/data/pointclouds/normal/${sceneData.file}`;
+  function loadScene() {
+    const sceneData = scenes[currentScene];
+    const competitor = competitors[currentCompetitor];
+    const base = `assets/images/data/pointclouds_comparisons/${sceneData.id}`;
 
-    // Update UI
+    // Serialize: ours first so its bbox seeds the scene normalization, then
+    // load the competitor with the same transform.
+    loadGlbToViewer(leftViewer, `${base}/ours.glb`,
+                    `${sceneData.id}_ours`, sceneData.id)
+      .then(() => loadGlbToViewer(
+        rightViewer, `${base}/${competitor.file}`,
+        `${sceneData.id}_${competitor.id}`, sceneData.id));
+
+    if (rgbImage) rgbImage.src = `${base}/rgb.jpg`;
+    rightLabel.innerText = competitor.name;
+
+    updateSceneUI();
+    updateCompetitorUI();
+  }
+
+  function updateSceneUI() {
     const buttons = selectorContainer.querySelectorAll('button');
     buttons.forEach((btn, idx) => {
-      if (idx === index) {
+      if (idx === currentScene) {
         btn.classList.add('ring-2', 'ring-emerald-600', 'opacity-100', 'shadow-md');
         btn.classList.remove('opacity-70', 'hover:opacity-100', 'shadow-sm');
       } else {
@@ -512,76 +520,93 @@ function initPointCloud() {
         btn.classList.add('opacity-70', 'hover:opacity-100', 'shadow-sm');
       }
     });
-
-    // Load to both viewers
-    // We use distinct cache keys for rgb vs normal
-    loadPlyToViewer(leftViewer, rgbPath, sceneData.id + '_rgb');
-    loadPlyToViewer(rightViewer, normalPath, sceneData.id + '_normal');
   }
 
-  // Generate UI Buttons
-  cloudScenes.forEach((item, index) => {
+  function updateCompetitorUI() {
+    const buttons = competitorSelector.querySelectorAll('button');
+    buttons.forEach((btn, idx) => {
+      if (idx === currentCompetitor) {
+        btn.classList.remove('bg-white', 'text-gray-700', 'border-gray-300', 'hover:bg-gray-50');
+        btn.classList.add('bg-emerald-600', 'text-white', 'border-emerald-600');
+      } else {
+        btn.classList.add('bg-white', 'text-gray-700', 'border-gray-300', 'hover:bg-gray-50');
+        btn.classList.remove('bg-emerald-600', 'text-white', 'border-emerald-600');
+      }
+    });
+  }
+
+  // Build scene UI
+  scenes.forEach((item, index) => {
     const btn = document.createElement('button');
     btn.className = `flex-shrink-0 w-20 h-14 rounded-md bg-cover bg-center transition-all duration-200 border border-gray-200 shadow-sm opacity-70 hover:opacity-100 focus:outline-none relative overflow-hidden`;
-    // We use a div for the background image to ensure it covers properly
-    btn.style.backgroundImage = `url('${item.thumb}')`;
-    btn.onclick = () => loadCloudScene(index);
-
+    btn.style.backgroundImage = `url('assets/images/data/pointclouds_comparisons/${item.id}/rgb.jpg')`;
+    btn.title = item.name;
+    btn.onclick = () => {
+      currentScene = index;
+      loadScene();
+      startAutoRotate();
+    };
     const span = document.createElement('span');
     span.className = 'block w-full h-full flex items-end justify-center pb-1 text-[9px] text-white font-bold drop-shadow-md bg-gradient-to-t from-black/80 to-transparent';
     span.innerText = item.name;
-
     btn.appendChild(span);
-
     selectorContainer.appendChild(btn);
   });
 
-  // Enable wheel scrolling through the scene carousel
+  // Build competitor UI
+  competitors.forEach((item, index) => {
+    const btn = document.createElement('button');
+    btn.className = `flex-shrink-0 px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider border transition-colors shadow-sm`;
+    btn.title = item.name;
+    btn.innerText = item.name;
+    btn.onclick = () => {
+      currentCompetitor = index;
+      loadScene();
+    };
+    competitorSelector.appendChild(btn);
+  });
+
   enableHorizontalWheelScroll(selectorContainer);
 
-  // Initial Load
-  loadCloudScene(0);
-
-  // Animation Loop
-  // Auto-rotate logic
-  let autoRotateTimer;
-  const AUTOROTATE_DELAY = 3000;
-
+  // Auto-rotate until the user touches a viewer — then stop until the next scene.
   function stopAutoRotate() {
-    clearTimeout(autoRotateTimer);
     leftViewer.controls.autoRotate = false;
     rightViewer.controls.autoRotate = false;
   }
-
   function startAutoRotate() {
     leftViewer.controls.autoRotate = true;
     rightViewer.controls.autoRotate = true;
   }
-
-  function resetTimer() {
-    stopAutoRotate();
-    autoRotateTimer = setTimeout(startAutoRotate, AUTOROTATE_DELAY);
-  }
-
+  // OrbitControls (r128) natively treats Ctrl/Meta/Shift + left-drag as pan
+  // when mouseButtons.LEFT is ROTATE (the default), so no extra wiring needed.
   [leftViewer, rightViewer].forEach(viewer => {
     viewer.controls.autoRotate = true;
     viewer.controls.autoRotateSpeed = 1.0;
-
-    viewer.renderer.domElement.addEventListener('mousedown', stopAutoRotate);
-    viewer.renderer.domElement.addEventListener('mouseup', resetTimer);
-    viewer.renderer.domElement.addEventListener('touchstart', stopAutoRotate);
-    viewer.renderer.domElement.addEventListener('touchend', resetTimer);
+    viewer.renderer.domElement.addEventListener('pointerdown', stopAutoRotate);
+    viewer.renderer.domElement.addEventListener('wheel', stopAutoRotate, { passive: true });
   });
 
-  // Animation Loop
+  // Lazy-load GLBs on first scroll-into-view and pause rendering while the
+  // viewer is off-screen, so the teaser video isn't competing with this
+  // section for bandwidth or GPU.
+  let viewerVisible = false;
+  let hasLoadedOnce = false;
+  const visibilityObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      viewerVisible = entry.isIntersecting;
+      if (viewerVisible && !hasLoadedOnce) {
+        hasLoadedOnce = true;
+        loadScene();
+      }
+    });
+  }, { rootMargin: '400px 0px' });
+  visibilityObserver.observe(container);
+
   function animate() {
     requestAnimationFrame(animate);
-
-    // Auto-rotate handled by OrbitControls now
-
+    if (!viewerVisible) return;
     leftViewer.controls.update();
     leftViewer.renderer.render(leftViewer.scene, leftViewer.camera);
-
     rightViewer.controls.update();
     rightViewer.renderer.render(rightViewer.scene, rightViewer.camera);
   }
@@ -592,5 +617,5 @@ function initPointCloud() {
 document.addEventListener('DOMContentLoaded', () => {
   initDepthComparison();
   initNormalComparison();
-  initPointCloud();
+  initPointCloudComparison();
 });

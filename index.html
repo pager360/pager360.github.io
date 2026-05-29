@@ -24,7 +24,7 @@
   <!-- Three.js -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/PLYLoader.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/loaders/GLTFLoader.js"></script>
 
   <!-- JS -->
   <script src="assets/js/script.js"></script>
@@ -455,7 +455,10 @@
           <div class="grid md:grid-cols-[minmax(0,1fr),auto] gap-0 border-b border-gray-100">
             <!-- Example Selector -->
             <div class="px-5 py-3 border-r border-gray-100 min-w-0 overflow-hidden">
-              <p class="text-[10px] text-gray-500 mb-1.5 font-bold uppercase tracking-wider">Scenes</p>
+              <p class="text-[10px] text-gray-500 mb-1.5 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <span>Scenes</span>
+                <span class="font-normal normal-case tracking-normal text-gray-400">&mdash; scroll for more &rarr;</span>
+              </p>
               <div id="depth-example-selector" class="flex gap-2.5 overflow-x-auto thin-scrollbar pb-1"></div>
             </div>
             <!-- Competitor Selector -->
@@ -510,6 +513,9 @@
               <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
                 <span class="material-icons-round text-purple-600">compare</span> Normal Comparison
               </h3>
+              <p class="text-xs text-gray-500 mt-1 max-w-md">
+                Drag the slider to compare PaGeR's surface normals against the strongest panoramic specialist (MTL), or against the input RGB panorama. Normal direction is encoded as RGB color.
+              </p>
             </div>
             <span
               class="bg-purple-100 text-purple-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Interactive</span>
@@ -567,21 +573,52 @@
           </div>
         </div>
 
-        <!-- Point Cloud -->
+        <!-- Point Cloud Comparison -->
         <div class="bg-white rounded-[2rem] border border-gray-200 shadow-sm overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
-            <div>
+          <div class="px-6 py-4 border-b border-gray-100 bg-gray-50/50 flex justify-between items-start gap-4">
+            <div class="space-y-2">
               <h3 class="text-lg font-bold text-gray-900 flex items-center gap-2">
-                <span class="material-icons-round text-emerald-600">view_in_ar</span> 3D Point Cloud
+                <span class="material-icons-round text-emerald-600">view_in_ar</span> 3D Point Cloud Comparison
               </h3>
+              <p class="text-xs text-gray-600 max-w-2xl">
+                PaGeR on the left, competitor on the right &mdash; cameras stay in sync. We compare PaGeR against the strongest scale-invariant competitor (DA²) and the strongest metric-depth competitor (DAP).
+              </p>
+              <div class="flex flex-wrap gap-x-5 gap-y-1 text-[11px] text-gray-700">
+                <span><span class="font-bold text-gray-900">Rotate:</span> drag</span>
+                <span><span class="font-bold text-gray-900">Pan:</span> Ctrl + drag, or two-finger touch</span>
+                <span><span class="font-bold text-gray-900">Zoom:</span> scroll</span>
+              </div>
+              <p class="text-[11px] text-gray-600 leading-relaxed max-w-2xl">
+                <span class="font-bold text-gray-900">What to look for:</span>
+                <span class="font-semibold text-gray-800">global layout</span> &mdash; PaGeR reconstructs a coherent scene with flat, parallel walls, where competitors warp and tilt the same surfaces;
+                <span class="font-semibold text-gray-800">local detail</span> &mdash; PaGeR preserves the fine geometry of edges and clutter, while competitors squash, oversmooth, and flatten it.
+              </p>
             </div>
             <span
-              class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">Interactive</span>
+              class="bg-emerald-100 text-emerald-800 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider flex-shrink-0">Interactive</span>
           </div>
 
-          <!-- Point Cloud Carousel -->
-          <div class="px-5 py-3 border-b border-gray-100">
-            <div id="cloud-selector" class="flex gap-2.5 overflow-x-auto thin-scrollbar pb-1"></div>
+          <div class="grid md:grid-cols-[minmax(0,1fr),auto] gap-0 border-b border-gray-100">
+            <!-- Scene Selector -->
+            <div class="px-5 py-3 border-r border-gray-100 min-w-0 overflow-hidden">
+              <p class="text-[10px] text-gray-500 mb-1.5 font-bold uppercase tracking-wider flex items-center gap-1.5">
+                <span>Scenes</span>
+                <span class="font-normal normal-case tracking-normal text-gray-400">&mdash; scroll for more &rarr;</span>
+              </p>
+              <div id="cloud-selector" class="flex gap-2.5 overflow-x-auto thin-scrollbar pb-1"></div>
+            </div>
+            <!-- Competitor Selector -->
+            <div class="px-5 py-3 bg-gray-50/30 md:max-w-xs lg:max-w-sm">
+              <p class="text-[10px] text-gray-500 mb-1.5 font-bold uppercase tracking-wider">Competitor</p>
+              <div id="cloud-competitor-selector" class="flex gap-2 flex-wrap"></div>
+            </div>
+          </div>
+
+          <!-- RGB Input Banner -->
+          <div class="px-5 py-4 border-b border-gray-100 bg-gray-50/30">
+            <p class="text-[10px] text-gray-500 mb-2 font-bold uppercase tracking-wider">Input RGB Panorama</p>
+            <img id="cloud-rgb-image" src=""
+              class="w-full h-32 md:h-40 object-cover rounded-md border border-gray-200 bg-gray-100" alt="RGB input panorama">
           </div>
 
           <div id="viewer-cloud" class="split-viewer" style="border-radius: 0;"></div>
